@@ -3,7 +3,8 @@ import {
     View,
     Text,
     SafeAreaView,
-    StyleSheet
+    StyleSheet,
+    TouchableOpacity
 } from 'react-native';
 import {
     widthPercentageToDP as wp,
@@ -11,7 +12,12 @@ import {
 } from 'react-native-responsive-screen';
 import  styles  from '../desgin/style';
 
-const Sidebar = () => {
+const Sidebar = ({navigation}) => {
+
+    const toProfileScreen = () => {
+        navigation.navigate('Profile')
+    }
+
     return (
         <View style={[{flex:1}]}>
             <View style={[{backgroundColor:'#EAC697'}]}>
@@ -21,9 +27,11 @@ const Sidebar = () => {
                 </SafeAreaView>
             </View>
             <View style={[{marginLeft:wp(5)}]}>
+                <TouchableOpacity onPress={() => toProfileScreen()}>
                 <View >
-                    <Text style={[inlineStyles.sideBarItem]}>Groceries</Text>
+                    <Text style={[inlineStyles.sideBarItem]}>Profile</Text>
                 </View>
+                </TouchableOpacity>
                 <View>
                     <Text style={[inlineStyles.sideBarItem]}>Food</Text>
                 </View>

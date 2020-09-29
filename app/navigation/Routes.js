@@ -10,10 +10,12 @@ import { colorCode } from '../desgin/colorCode';
 import Calendar from '../screens/Calendar';
 import Payment from '../screens/Payment';
 import Setting from '../screens/Settings';
+import Profile from '../screens/Profile';
 import Icon from '../component/Icon'
 
 const Drawer = createDrawerNavigator();
 const AppStack = createStackNavigator();
+const AuthStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -25,7 +27,7 @@ const AppScreen = ({navigation}) => {
                 headerTruncatedBackTitle: false,
                 headerTitleStyle: {fontSize: 18},
                 headerLeft: () => (
-                    <TouchableOpacity style={{marginLeft:wp(4)}} onPress={navigation.toggleDrawer()}>
+                    <TouchableOpacity style={{marginLeft:wp(4)}}  onPress={() => navigation.toggleDrawer()}>
                         <Icon
                         name="menu"
                         size={20}
@@ -37,6 +39,11 @@ const AppScreen = ({navigation}) => {
                 gestureEnabled: false,
             }}
         >
+            <AppStack.Screen 
+                name="Profile"
+                component={Profile}
+                options={headerOptions}
+            />
             <AppStack.Screen 
                 name="Dashboard"
                 component={Dashboard}
@@ -50,6 +57,36 @@ const AppScreen = ({navigation}) => {
         </AppStack.Navigator>
     );
 };
+
+// const AuthScreen = ({navigation}) => {
+//     return (
+//         <AuthStack.Navigator
+//             screenOptions={{
+//                 headerBackTitle: null,
+//                 headerTruncatedBackTitle: false,
+//                 headerTitleStyle: {fontSize: 18},
+//                 headerLeft: () => (
+//                     <TouchableOpacity style={{marginLeft:wp(4)}}  onPress={() => navigation.toggleDrawer()}>
+//                         <Icon
+//                         name="menu"
+//                         size={20}
+//                         color="#fff"
+//                         iconType="SimpleLineIcons"
+//                         />
+//                     </TouchableOpacity>
+//                 ),
+//                 gestureEnabled: false,
+//             }}
+//         >
+//             <AuthStack.Screen 
+//                 name="Profile"
+//                 component={Profile}
+//                 options={headerOptions}
+//             />
+            
+//         </AuthStack.Navigator>
+//     );
+// };
 
 const Details = () => {
     return (
@@ -70,9 +107,37 @@ const Details = () => {
 
 const Tabs = () => {
     return (
-        <Tab.Navigator>
-            <Tab.Screen name="Status" component={AppScreen} />
-            <Tab.Screen name="Details" component={Details} />
+        <Tab.Navigator
+        tabBarOptions={{
+            activeTintColor: 'red',
+          }}
+        >
+            <Tab.Screen 
+            name="Status" 
+            component={AppScreen} 
+            options={{
+                tabBarIcon:({focused}) => {
+                    return <Icon 
+                    name='account-balance' 
+                    iconType='MaterialIcons'   
+                    color = {focused ? "red" : "gray"}
+                    size={20} 
+                    />
+                },
+            }}  />
+            <Tab.Screen 
+            name="Details" 
+            component={Details}
+            options={{
+                tabBarIcon:({focused}) => {
+                    return <Icon 
+                    name='calendar-blank-multiple' 
+                    iconType='MaterialCommunityIcons'   
+                    color = {focused ? "red" : "gray"}
+                    size={20} 
+                    />
+                },
+            }}  />
         </Tab.Navigator>
     )  
 }

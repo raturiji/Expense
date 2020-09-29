@@ -6,7 +6,6 @@ import {
     StyleSheet,
     TouchableOpacity
 } from 'react-native';
-
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -14,11 +13,26 @@ import {
 import { colorCode } from '../desgin/colorCode';
 import Icon from '../component/Icon';
 import Pie from 'react-native-pie';
+import Realm from 'realm';
 
 export default  Dashboard = ({navigation}) => {
+    const [dbData,setDbData] = useState(null)
+    useEffect(() => {
+        Realm.open({
+            schema: [{name:'Expense',properties:{name:'string'}}]
+        }).then(realm => {
+            realm.write(() => {
+                realm.create('Dog',{name:'Rex'});
+            });
+            console.log(realm.objects('Dog').length)
+            setDbData(realm);
+        }); 
+    }, [])
+
     const nextScreen = () => {
         navigation.navigate('Payment')
     }
+
     return (
         <>
         <ScrollView>
@@ -108,7 +122,7 @@ export default  Dashboard = ({navigation}) => {
                 </View>
             </View> 
         </ScrollView>
-        <TouchableOpacity style={{position:'absolute',bottom:'2%',left:'35%',}} onPress={() => nextScreen()}>
+        <TouchableOpacity style={{position:'absolute',bottom:'2%',left:'30%',}} onPress={() => nextScreen()}>
             <View style={[inlineStyles.paymentBtn,styles.row,styles.ctr]}>
                 <Text style={{color:colorCode.light,fontSize:wp(8)}}>+</Text>
                 <Text style={{color:colorCode.light,fontSize:wp(4)}}> New Payment</Text>
@@ -149,9 +163,8 @@ const inlineStyles = StyleSheet.create({
     },
     paymentBtn:{
         backgroundColor:'#008080',
-        width:wp(35),
-        paddingHorizontal:wp(1),
         paddingVertical:wp(1),
+        paddingHorizontal:wp(4),
         borderRadius:25,
     }
 })
