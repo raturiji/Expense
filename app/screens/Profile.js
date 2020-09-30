@@ -4,6 +4,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { colorCode } from '../desgin/colorCode';
 import { TextInput } from 'react-native-paper';
 import Realm from 'realm';
+import moment from 'moment';
 
 export default (Profile = () => {
     const [firstName,setFirstName] = useState('');
@@ -11,11 +12,42 @@ export default (Profile = () => {
     const [income,setIncome] = useState(0);
     const [savings,setSavings] = useState(0);
 
+
     const createProfile = () => {
         Realm.open({
-            schema: [{name:'User',properties:{FirstName:'string',LastName:'string',income:'int',Savings:'int'}}]
+             schema: [
+               Schema.User
+            ]
         }).then(realm => {
-            
+            realm.write(() => {
+                realm.create('User',
+                    { id: Math.random(),
+                      FirstName: firstName,
+                      LastName: lastName,
+                      Image: 'asfdsf',
+                      Income: parseInt(income),
+                      Savings: parseInt(savings)
+                    }
+                );
+                realm.create('Expense',
+                    { id: Math.random(),
+                      Title: 'Initial Expense',
+                      Amount: parseInt(income) - parseInt(savings),
+                      Image: 'fghfgh',
+                      DateAndTime: moment().format('dd/mm/yyyy'),
+                      User: 1
+                    }
+                );
+                realm.create('Income',
+                    { id: Math.random(),
+                      Title: 'Initial Savings',
+                      Amount: parseInt(savings),
+                      Image: 'fhgdfh',
+                      DateAndTime: moment().format('dd/mm/yyyy'),
+                      User: 1
+                    }
+                )
+            })
         }); 
     }
 	return (

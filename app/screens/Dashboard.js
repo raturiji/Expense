@@ -17,16 +17,13 @@ import Realm from 'realm';
 
 export default  Dashboard = ({navigation}) => {
     const [dbData,setDbData] = useState(null)
+    const [user,setUser] = useState('')
     useEffect(() => {
-        Realm.open({
-            schema: [{name:'Expense',properties:{name:'string'}}]
-        }).then(realm => {
-            realm.write(() => {
-                realm.create('Dog',{name:'Rex'});
-            });
-            console.log(realm.objects('Dog').length)
-            setDbData(realm);
-        }); 
+        Realm.open({schema:[
+            Schema.User
+    ]}).then((realm) => {
+        setUser(realm.objects('User')[0]) 
+    })
     }, [])
 
     const nextScreen = () => {
@@ -36,22 +33,22 @@ export default  Dashboard = ({navigation}) => {
     return (
         <>
         <ScrollView>
-            <View style={[styles.mhSm,styles.mvSm,{backgroundColor:colorCode.light,borderRadius:4}]}>
+            <View style={[styles.mhSm, styles.mvSm, {backgroundColor:colorCode.light,borderRadius:4}]}>
                 <View style={[styles.row,styles.between,styles.mhSm,styles.mvSm]}>
                     <Text style={[{fontSize:hp(3)}]}>Overview - December</Text>
                     <Icon iconType='AntDesign' color='black' size={20} name='caretdown'/>
                 </View>
                 <View style={[styles.row,styles.between,styles.mhSm,{marginVertical:hp(1)}]}>
                     <Text style={[inlineStyles.overviewDetails,{borderLeftColor: '#39B7CD'}]}>Income</Text>
-                    <Text style={[styles.sm]}>&#8377; 50000</Text>
+                    <Text style={[styles.sm]}>&#8377; {user && user.Income}</Text>
                 </View>
                 <View style={[styles.row,styles.between,styles.mhSm,{marginVertical:hp(1)}]}>
                     <Text style={[inlineStyles.overviewDetails,{borderLeftColor: colorCode.danger}]}>Expenses</Text>
-                    <Text style={[styles.sm]}>&#8377; 50000</Text>
+                    <Text style={[styles.sm]}>&#8377; {user && user.Income - user.Savings}</Text>
                 </View>
                 <View style={[styles.row,styles.between,styles.mhSm,{marginVertical:hp(1)}]}>
                     <Text style={[inlineStyles.overviewDetails,{borderLeftColor: colorCode.success}]}>Savings</Text>
-                    <Text style={[styles.sm]}>&#8377; 50000</Text>
+                    <Text style={[styles.sm]}>&#8377; {user && user.Savings}</Text>
                 </View>
             </View>
             <View style={[styles.mhSm,styles.mvSm,{backgroundColor:colorCode.light,borderRadius:4}]}>

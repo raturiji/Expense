@@ -1,4 +1,4 @@
-import React from 'react';
+import React , {useEffect} from 'react';
 import {View,Text ,TouchableOpacity} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,6 +11,7 @@ import Calendar from '../screens/Calendar';
 import Payment from '../screens/Payment';
 import Setting from '../screens/Settings';
 import Profile from '../screens/Profile';
+import Schema from '../Database/Schema';
 import Icon from '../component/Icon'
 
 const Drawer = createDrawerNavigator();
@@ -20,6 +21,22 @@ const DetailsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppScreen = ({navigation}) => {
+    useEffect(() => {
+        Realm.open(
+            {schema:[
+                { name: 'User',
+                  primaryKey: 'id',
+                  properties:
+                    { id:'int',
+                      FirstName:'string',
+                      LastName:'string',
+                      Image: 'string',
+                      Income:'int',
+                      Savings:'int'
+                    }}
+            ]}
+        ).then(realm => realm.objects('User').length > -1 ? navigation.navigate('Dashboard') : null)
+    },[])
     return (
         <AppStack.Navigator
             screenOptions={{
