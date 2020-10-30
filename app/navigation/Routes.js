@@ -10,7 +10,7 @@ import {
 import Dashboard from '../screens/Dashboard';
 import Sidebar from '../component/Sidebar';
 import {colorCode} from '../desgin/colorCode';
-import Calendar from '../screens/Calendar';
+import ExpenseCalendar from '../screens/ExpenseCalendar';
 import Payment from '../screens/Payment';
 import Settings from '../screens/Settings';
 import Profile from '../screens/Profile';
@@ -108,8 +108,8 @@ const Details = () => {
   return (
     <DetailsStack.Navigator>
       <DetailsStack.Screen
-        name="Calendar"
-        component={Calendar}
+        name="Expense Calendar"
+        component={ExpenseCalendar}
         options={headerOptions}
       />
       <DetailsStack.Screen

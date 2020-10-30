@@ -1,10 +1,11 @@
-import React, {useState, useEffect, cloneElement} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -20,6 +21,7 @@ import * as wpActions from '../Store/actions';
 import moment from 'moment';
 import Schema from '../Database/Schema';
 import {styles} from '../desgin/style';
+import {RNCamera} from 'react-native-camera';
 
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
@@ -59,18 +61,24 @@ const Dashboard = ({navigation}) => {
 
   const ExpensePercentage = ((user.Income - saving) / user.Income) * 100;
   const SavingPercentage = (saving / user.Income) * 100;
-  console.log(data, 'works');
+
   return (
-    <>
+    <ImageBackground
+      source={require('../assets/images/background2.jpg')}
+      style={{flex: 1}}>
       <ScrollView>
         <View
           style={[
             styles.mhSm,
             styles.mvSm,
-            {backgroundColor: colorCode.light, borderRadius: 4},
+            {
+              backgroundColor: colorCode.light,
+              borderRadius: 4,
+              paddingBottom: 20,
+            },
           ]}>
           <View style={[styles.row, styles.between, styles.mhSm, styles.mvSm]}>
-            <Text style={[{fontSize: hp(3)}]}>Overview - December</Text>
+            <Text style={styles.headerTitle}>Overview - December</Text>
             <Icon
               iconType="AntDesign"
               color="black"
@@ -83,15 +91,12 @@ const Dashboard = ({navigation}) => {
               styles.row,
               styles.between,
               styles.mhSm,
-              {marginVertical: hp(1)},
+              {
+                borderLeftWidth: 5,
+                borderLeftColor: '#0c9',
+              },
             ]}>
-            <Text
-              style={[
-                inlineStyles.overviewDetails,
-                {borderLeftColor: '#39B7CD'},
-              ]}>
-              Income
-            </Text>
+            <Text style={[inlineStyles.overviewDetails]}>Income</Text>
             <Text style={[styles.sm]}>&#8377; {user && user.Income}</Text>
           </View>
           <View
@@ -99,7 +104,11 @@ const Dashboard = ({navigation}) => {
               styles.row,
               styles.between,
               styles.mhSm,
-              {marginVertical: hp(1)},
+              {
+                marginVertical: hp(1),
+                borderLeftWidth: 5,
+                borderLeftColor: 'tomato',
+              },
             ]}>
             <Text
               style={[
@@ -117,7 +126,10 @@ const Dashboard = ({navigation}) => {
               styles.row,
               styles.between,
               styles.mhSm,
-              {marginVertical: hp(1)},
+              {
+                borderLeftWidth: 5,
+                borderLeftColor: '#0cf',
+              },
             ]}>
             <Text
               style={[
@@ -135,37 +147,38 @@ const Dashboard = ({navigation}) => {
             styles.mvSm,
             {backgroundColor: colorCode.light, borderRadius: 4},
           ]}>
-          <Text style={[styles.mhSm, styles.mvSm, {fontSize: hp(3)}]}>
-            Expenses by Category
-          </Text>
+          <Text style={styles.headerTitle}>Expenses by Category</Text>
           <View style={[styles.row, styles.between, styles.mhSm, styles.mvSm]}>
-            <Pie
-              radius={50}
-              innerRadius={20}
-              sections={[
-                {
-                  percentage: 100,
-                  color: '#39B7CD',
-                },
-                {
-                  percentage: ExpensePercentage,
-                  color: 'red',
-                },
-                {
-                  percentage: SavingPercentage,
-                  color: 'green',
-                },
-              ]}
-              strokeCap={'butt'}
-            />
+            {saving && (
+              <Pie
+                radius={50}
+                innerRadius={20}
+                sections={[
+                  {
+                    percentage: 100,
+                    color: '#39B7CD',
+                  },
+                  {
+                    percentage: parseInt(ExpensePercentage),
+                    color: 'red',
+                  },
+                  {
+                    percentage: parseInt(SavingPercentage),
+                    color: 'green',
+                  },
+                ]}
+                strokeCap={'butt'}
+              />
+            )}
             <View style={[styles.mhSm]}>
               <Text
                 style={[
                   {
                     fontFamily: 'DroidSans-Bold',
                     color: '#111E6C',
-                    fontSize: hp(3),
-                    width: wp(65),
+                    fontSize: 16,
+                    width: '80%',
+                    paddingBottom: 5,
                   },
                 ]}>
                 You have saved &#8377; {saving} by now.
@@ -174,20 +187,15 @@ const Dashboard = ({navigation}) => {
                 style={[
                   {
                     fontFamily: 'DroidSans-Bold',
-                    color: colorCode.dark,
-                    fontSize: hp(2),
+                    color: colorCode.darkGray,
+                    fontSize: 14,
                     width: wp(65),
+                    paddingBottom: 10,
                   },
                 ]}>
                 You are few bucks away to reach your goal
               </Text>
-              <View
-                style={[
-                  inlineStyles.detailsBtn,
-                  styles.row,
-                  styles.ctr,
-                  {marginVertical: hp(1)},
-                ]}>
+              <View style={[inlineStyles.detailsBtn, styles.row, styles.ctr]}>
                 <Text style={[{color: colorCode.light}]}>View Details</Text>
               </View>
             </View>
@@ -199,28 +207,17 @@ const Dashboard = ({navigation}) => {
             styles.mvSm,
             {backgroundColor: colorCode.light, borderRadius: 4},
           ]}>
-          <Text style={[styles.mhSm, styles.mvSm, {fontSize: hp(3)}]}>
-            Recent Activity
-          </Text>
+          <Text style={styles.headerTitle}>Recent Activity</Text>
           {data
             .slice(-4)
             .reverse()
             .map((item) => (
-              <View
-                style={[
-                  {backgroundColor: '#893F45', borderRadius: 10},
-                  styles.row,
-                  styles.between,
-                  styles.phSm,
-                  styles.pvSm,
-                  styles.mhSm,
-                  styles.mvSm,
-                ]}>
+              <View style={[styles.row, styles.between, {padding: 15}]}>
                 <View>
                   <Text style={[inlineStyles.customHeading]}>{item.Title}</Text>
-                  <Text style={{color: colorCode.light}}>
+                  {/* <Text style={{color: colorCode.dark}}>
                     {item.DateAndTime}
-                  </Text>
+                  </Text> */}
                 </View>
                 <View>
                   <Text style={inlineStyles.priceTag}>
@@ -231,38 +228,27 @@ const Dashboard = ({navigation}) => {
             ))}
         </View>
       </ScrollView>
-      {/* <TouchableOpacity
-        style={{position: 'absolute', bottom: '2%', left: '30%'}}
-        onPress={() => nextScreen()}>
-        <View style={[inlineStyles.paymentBtn, styles.row, styles.ctr]}>
-          <Text style={{color: colorCode.light, fontSize: wp(8)}}>+</Text>
-          <Text style={{color: colorCode.light, fontSize: wp(4)}}>
-            {' '}
-            New Payment
-          </Text>
-        </View>
-      </TouchableOpacity> */}
       <FAB
         icon="plus"
         label="New Payment"
         style={{
           position: 'absolute',
-          bottom: '2%',
-          left: '30%',
+          bottom: '5%',
+          alignSelf: 'center',
           backgroundColor: '#008080',
         }}
         onPress={nextScreen}
       />
-    </>
+    </ImageBackground>
   );
 };
 
 const inlineStyles = StyleSheet.create({
   overviewDetails: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#39B7CD',
-    paddingVertical: hp(1),
-    paddingLeft: hp(1.5),
+    fontSize: 16,
+    textTransform: 'uppercase',
+    paddingLeft: 10,
+    letterSpacing: 1.2,
   },
   detailsBtn: {
     backgroundColor: 'orange',
@@ -271,10 +257,10 @@ const inlineStyles = StyleSheet.create({
     borderRadius: 50,
   },
   customHeading: {
-    fontFamily: 'DroidSans-Bold',
-    color: colorCode.light,
-    fontSize: hp(2),
+    color: '#008b8b',
+    fontSize: 18,
     width: wp(65),
+    fontWeight: 'bold',
   },
   listItem: {
     paddingVertical: hp(1),
@@ -282,9 +268,10 @@ const inlineStyles = StyleSheet.create({
     borderBottomColor: colorCode.light,
   },
   priceTag: {
-    fontSize: hp(2),
-    color: colorCode.light,
-    fontFamily: 'DroidSans-Bold',
+    color: 'orange',
+    fontSize: hp(3),
+    fontWeight: 'bold',
+    textAlign: 'right',
   },
   paymentBtn: {
     backgroundColor: '#008080',

@@ -6,6 +6,7 @@ import {colorCode} from './app/desgin/colorCode';
 import {Store, persistor} from './app/Store';
 import {Provider as StoreProvider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
+import FlashMessage from 'react-native-flash-message';
 
 const theme = {
   ...DefaultTheme,
@@ -26,6 +27,7 @@ const App = () => {
           <NavigationContainer>
             <Routes />
           </NavigationContainer>
+          <FlashMessage position="top" />
         </PersistGate>
       </PaperProvider>
     </StoreProvider>

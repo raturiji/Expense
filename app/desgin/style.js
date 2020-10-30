@@ -65,4 +65,11 @@ export const styles = StyleSheet.create({
   lg: {
     fontSize: hp(8),
   },
+  headerTitle: {
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    fontSize: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
 });

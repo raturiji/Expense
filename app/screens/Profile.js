@@ -17,15 +17,18 @@ import Realm from 'realm';
 import {useSelector, useDispatch} from 'react-redux';
 import * as wpActions from '../Store/actions';
 import moment from 'moment';
+import {showMessage} from 'react-native-flash-message';
 import Schema from '../Database/Schema';
 import {styles} from '../desgin/style';
 
 const Profile = ({navigation}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [income, setIncome] = useState(0);
-  const [savings, setSavings] = useState(0);
+  const [income, setIncome] = useState('');
+  const [savings, setSavings] = useState('');
+  const [validationError, setValidationError] = useState({});
   const dispatch = useDispatch();
+
   const createProfile = () => {
     Realm.open({
       schema: [Schema.User, Schema.Expense, Schema.Income, Schema.Category],
@@ -72,37 +75,196 @@ const Profile = ({navigation}) => {
     });
   };
 
+  const validationData = () => {
+    const error = {};
+    if (firstName === '') {
+      error.firstName = {
+        type: 'required',
+        message: 'Please enter your first name. It is a required field.',
+      };
+    }
+    if (firstName.length >= 60) {
+      error.firstName = {
+        type: 'strength',
+        message: 'Please enter first name in between 1 - 60',
+      };
+    }
+    if (lastName === '') {
+      error.lastName = {
+        type: 'required',
+        message: 'Please enter your last name. It is a required field.',
+      };
+    }
+    if (lastName.length >= 60) {
+      error.lastName = {
+        type: 'strength',
+        message: 'Please enter last name in between 1 - 60',
+      };
+    }
+    if (income === '') {
+      error.income = {
+        type: 'required',
+        message: 'Please enter your income. It is a required field.',
+      };
+    }
+    if (isNaN(income)) {
+      error.income = {
+        type: 'invalid',
+        message: 'Please enter valid income input in this field.',
+      };
+    }
+    if (savings === '') {
+      error.savings = {
+        type: 'required',
+        message: 'Please enter your savings. It is a required field.',
+      };
+    }
+    if (isNaN(savings)) {
+      error.savings = {
+        type: 'invalid',
+        message: 'Please enter valid savings input in this field.',
+      };
+    }
+    if (Object.keys(error).length === 0) {
+      createProfile();
+    } else {
+      setValidationError(error);
+      showMessage({
+        message: 'Invalid Input!',
+        description:
+          'Please enter the valid input in the following input fields.',
+        type: 'danger',
+      });
+    }
+  };
+
   return (
     <View>
       <Text style={[inlineStyles.heading]}>Profile Details</Text>
       <TextInput
         label="First Name"
         mode="outlined"
-        placeholder="Enter the First Name"
+        placeholder="Enter your First Name"
         onChangeText={(text) => setFirstName(text)}
         style={{marginHorizontal: wp(4)}}
       />
+      {validationError &&
+        validationError.firstName &&
+        validationError.firstName.type === 'required' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.firstName.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.firstName &&
+        validationError.firstName.type === 'strength' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.firstName.message}
+          </Text>
+        )}
       <TextInput
         label="Last Name"
         mode="outlined"
-        placeholder="Enter the Last Name"
+        placeholder="Enter your Last Name"
         onChangeText={(text) => setLastName(text)}
         style={{marginHorizontal: wp(4)}}
       />
+      {validationError &&
+        validationError.lastName &&
+        validationError.lastName.type === 'required' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.lastName.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.lastName &&
+        validationError.lastName.type === 'strength' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.lastName.message}
+          </Text>
+        )}
       <TextInput
         label="Income"
         mode="outlined"
-        placeholder="Enter the income"
+        placeholder="Enter your income"
         onChangeText={(text) => setIncome(text)}
         style={{marginHorizontal: wp(4)}}
       />
+      {validationError &&
+        validationError.income &&
+        validationError.income.type === 'required' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.income.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.income &&
+        validationError.income.type === 'invalid' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.income.message}
+          </Text>
+        )}
       <TextInput
         label="Savings"
         mode="outlined"
-        placeholder="Enter the savings"
+        placeholder="Enter your savings"
         onChangeText={(text) => setSavings(text)}
         style={{marginHorizontal: wp(4)}}
       />
+      {validationError &&
+        validationError.savings &&
+        validationError.savings.type === 'required' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.savings.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.savings &&
+        validationError.savings.type === 'invalid' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.savings.message}
+          </Text>
+        )}
       {/* <View style={{height:hp(20),backgroundColor:'white',marginVertical:hp(5),marginHorizontal:wp(30)}}>
 
             </View> */}
@@ -123,7 +285,7 @@ const Profile = ({navigation}) => {
           styles.pvSm,
           styles.mvSm,
         ]}
-        onPress={() => createProfile()}>
+        onPress={validationData}>
         <Text style={[inlineStyles.submitText]}>Submit</Text>
       </TouchableOpacity>
     </View>
