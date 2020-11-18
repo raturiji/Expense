@@ -21,7 +21,6 @@ import * as wpActions from '../Store/actions';
 import moment from 'moment';
 import Schema from '../Database/Schema';
 import {styles} from '../desgin/style';
-import {RNCamera} from 'react-native-camera';
 
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
@@ -211,8 +210,8 @@ const Dashboard = ({navigation}) => {
           {data
             .slice(-4)
             .reverse()
-            .map((item) => (
-              <View style={[styles.row, styles.between, {padding: 15}]}>
+            .map((item, i) => (
+              <View key={i} style={[styles.row, styles.between, {padding: 15}]}>
                 <View>
                   <Text style={[inlineStyles.customHeading]}>{item.Title}</Text>
                   {/* <Text style={{color: colorCode.dark}}>
@@ -278,6 +277,7 @@ const inlineStyles = StyleSheet.create({
     paddingVertical: wp(1),
     paddingHorizontal: wp(4),
     borderRadius: 25,
+    marginVertical: 2,
   },
 });
 

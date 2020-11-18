@@ -14,10 +14,10 @@ import {
 import {FAB} from 'react-native-paper';
 import {colorCode} from '../desgin/colorCode';
 import {Calendar} from 'react-native-calendars';
-import {RNCamera} from 'react-native-camera';
 import ExpenseDetailsModal from '../component/ExpenseDetailsModal';
 import {styles} from '../desgin/style';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {launchCamera} from 'react-native-image-picker';
 
 const ExpenseCalendar = ({navigation}) => {
   let camera;
@@ -96,6 +96,20 @@ const ExpenseCalendar = ({navigation}) => {
           },
         }}
       />
+      {/* <RNCamera
+        ref={(ref) => {
+          camera = ref;
+        }}
+        style={inlineStyles.preview}
+        type={RNCamera.Constants.Type.back}
+        flashMode={RNCamera.Constants.FlashMode.on}
+        androidCameraPermissionOptions={{
+          title: 'Permission to use camera',
+          message: 'We need your permission to use your camera',
+          buttonPositive: 'Ok',
+          buttonNegative: 'Cancel',
+        }}
+      /> */}
       <ImageBackground
         style={{width: wp(100), height: hp(100)}}
         source={require('../assets/images/background3.jpg')}>
@@ -138,29 +152,6 @@ const ExpenseCalendar = ({navigation}) => {
           {expenseListItem()}
         </ScrollView>
       </ImageBackground>
-      <RNCamera
-        ref={(ref) => {
-          camera = ref;
-        }}
-        style={inlineStyles.preview}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
-        androidRecordAudioPermissionOptions={{
-          title: 'Permission to use audio recording',
-          message: 'We need your permission to use your audio',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
-        onGoogleVisionBarcodesDetected={({barcodes}) => {
-          console.log(barcodes);
-        }}
-      />
       <FAB
         icon="plus"
         animated={true}
@@ -170,7 +161,7 @@ const ExpenseCalendar = ({navigation}) => {
           right: wp(6),
           bottom: hp(5),
         }}
-        onPress={takePicture}
+        onPress={launchCamera}
       />
     </View>
   );
@@ -190,7 +181,12 @@ const inlineStyles = StyleSheet.create({
     height: wp(10),
   },
   preview: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: wp(100),
+    height: hp(100),
+    zIndex: 1000,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },

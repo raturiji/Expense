@@ -139,7 +139,7 @@ const Profile = ({navigation}) => {
   };
 
   return (
-    <View>
+    <ScrollView>
       <Text style={[inlineStyles.heading]}>Profile Details</Text>
       <TextInput
         label="First Name"
@@ -288,7 +288,7 @@ const Profile = ({navigation}) => {
         onPress={validationData}>
         <Text style={[inlineStyles.submitText]}>Submit</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

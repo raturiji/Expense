@@ -5,7 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
   ImageBackground,
+  Modal,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -20,6 +22,7 @@ import moment from 'moment';
 import {showMessage} from 'react-native-flash-message';
 import {useSelector} from 'react-redux';
 import Icon from '../component/Icon';
+import {ImagePicker, openGallery} from '../component/ImagePicker';
 import {styles} from '../desgin/style';
 
 const Payment = ({navigation}) => {
@@ -29,6 +32,8 @@ const Payment = ({navigation}) => {
   const currentProfile = useSelector((state) => state.appData.userData);
   const [listItem, setListItem] = useState('Category');
   const [expanded, setExpanded] = useState(false);
+  const [image, setImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const makePayment = () => {
     Realm.open({schema: [Schema.User, Schema.Expense]}).then((realm) => {
@@ -103,11 +108,20 @@ const Payment = ({navigation}) => {
     setExpanded(false);
   };
 
+  const fetchImageData = async (option) => {
+    option === 'openCamera' ? ImagePicker(callback) : openGallery(callback);
+  };
+
+  const callback = (res) => {
+    setImage(res.uri);
+    setShowModal(false);
+  };
+ console.log(image);
   return (
     <ImageBackground
       source={require('../assets/images/background2.jpg')}
       style={{flex: 1}}>
-      <View>
+      <ScrollView>
         <Text style={[inlineStyles.heading]}>Payment Details</Text>
         <TextInput
           label="Payment Title"
@@ -171,15 +185,20 @@ const Payment = ({navigation}) => {
               {validationError.amount.message}
             </Text>
           )}
-        {/* <View style={{height:hp(20),backgroundColor:'white',marginVertical:hp(5),marginHorizontal:wp(30)}}>
-        </View> */}
+        {image && (
+          <Image
+            source={{uri: image}}
+            style={{
+              height: hp(20),
+              backgroundColor: 'white',
+              marginVertical: hp(3),
+              marginHorizontal: wp(30),
+            }}
+          />
+        )}
         <TouchableOpacity
-          style={[
-            inlineStyles.captureBtn,
-            styles.row,
-            styles.pvSm,
-            styles.mvSm,
-          ]}>
+          style={[inlineStyles.captureBtn, styles.row]}
+          onPress={() => setShowModal(true)}>
           <Icon iconType="FontAwesome" name="camera" size={40} color="grey" />
           <Text
             style={{
@@ -250,14 +269,6 @@ const Payment = ({navigation}) => {
               {validationError.category.message}
             </Text>
           )}
-        {/* <TouchableOpacity style={[{backgroundColor:'#e3e3e3',borderRadius:10},styles.row,styles.between,styles.phSm,styles.pvSm,styles.mhSm,styles.mvSm]} onPress={selectCategory}>
-                <View>
-                    <Text style={[styles.sm,{color:colorCode.dark}]}>Category</Text>
-                </View>
-                <View>
-                    <Text style={[styles.sm]}> General</Text>
-                </View>
-            </TouchableOpacity> */}
         <TouchableOpacity
           style={[
             {backgroundColor: '#008080', marginHorizontal: wp(4)},
@@ -272,7 +283,74 @@ const Payment = ({navigation}) => {
           style={[inlineStyles.cancelBtn]}>
           <Text style={[inlineStyles.submitText]}>Cancel</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
+      {showModal ? (
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            width: wp(100),
+            height: hp(100),
+            position: 'absolute',
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: wp(60),
+              backgroundColor: 'white',
+              borderColor: '#A9A9A9',
+              borderWidth: 1,
+              elevation: 1000,
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                padding: hp(2),
+                alignItems: 'center',
+              }}
+              onPress={() => fetchImageData('openCamera')}>
+              <Icon
+                iconType="FontAwesome"
+                name="camera"
+                size={40}
+                color="grey"
+              />
+              <Text style={{fontSize: hp(2), marginLeft: wp(2)}}>
+                Take Photo
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                padding: hp(2),
+                alignItems: 'center',
+              }}
+              onPress={() => fetchImageData('openGallery')}>
+              <Icon
+                iconType="MaterialIcons"
+                name="photo-size-select-actual"
+                size={40}
+                color="grey"
+              />
+              <Text style={{fontSize: hp(2), marginLeft: wp(2)}}>
+                Open from Storage
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowModal(false)}>
+              <Text
+                style={{
+                  padding: hp(2),
+                  fontSize: hp(2),
+                  textAlign: 'center',
+                  color: 'red',
+                }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
     </ImageBackground>
   );
 };
@@ -288,6 +366,7 @@ const inlineStyles = StyleSheet.create({
   captureBtn: {
     borderRadius: 25,
     alignSelf: 'center',
+    marginVertical: hp(5),
   },
   submitText: {
     fontSize: hp(2),
@@ -307,5 +386,6 @@ const inlineStyles = StyleSheet.create({
     alignSelf: 'center',
     padding: wp(2),
     borderRadius: 50,
+    marginBottom: hp(5),
   },
 });

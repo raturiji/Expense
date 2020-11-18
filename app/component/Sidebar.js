@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {styles} from '../desgin/style';
+import Icon from './Icon';
 import {colorCode} from '../desgin/colorCode';
+import ImagePicker from '../component/ImagePicker';
 
 const Sidebar = ({navigation}) => {
+  const [image, setImage] = useState(null);
   const toProfileScreen = () => {
     navigation.navigate('Profile');
   };
@@ -34,6 +37,13 @@ const Sidebar = ({navigation}) => {
         <ListItem title="Gaming" />
         <ListItem title="Food" />
         <ListItem title="Travel" />
+        <TouchableOpacity
+          style={[styles.row, {paddingLeft: wp(4), paddingVertical: hp(2)}]}>
+          <Icon iconType="AntDesign" size={20} name="plus" color="white" />
+          <Text style={{color: 'white', marginHorizontal: wp(2)}}>
+            Add Category
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
