@@ -32,6 +32,7 @@ const Dashboard = ({navigation}) => {
     const unsubscribe = navigation.addListener('focus', () => {
       user &&
         Realm.open({schema: [Schema.User]}).then((realm) => {
+          console.log(realm.objects('User')[0]);
           dispatch(wpActions.saveUser(realm.objects('User')[0]));
           setUser(realm.objects('User')[0]);
         });
@@ -117,7 +118,7 @@ const Dashboard = ({navigation}) => {
               Expenses
             </Text>
             <Text style={[styles.sm]}>
-              &#8377; {user && user.Income - saving}
+              &#8377; {user && isNaN(user.Income - saving) ? 0 : user.Income - saving}
             </Text>
           </View>
           <View

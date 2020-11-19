@@ -74,36 +74,6 @@ const AppScreen = ({navigation}) => {
   );
 };
 
-// const AuthScreen = ({navigation}) => {
-//     return (
-//         <AuthStack.Navigator
-//             screenOptions={{
-//                 headerBackTitle: null,
-//                 headerTruncatedBackTitle: false,
-//                 headerTitleStyle: {fontSize: 18},
-//                 headerLeft: () => (
-//                     <TouchableOpacity style={{marginLeft:wp(4)}}  onPress={() => navigation.toggleDrawer()}>
-//                         <Icon
-//                         name="menu"
-//                         size={20}
-//                         color="#fff"
-//                         iconType="SimpleLineIcons"
-//                         />
-//                     </TouchableOpacity>
-//                 ),
-//                 gestureEnabled: false,
-//             }}
-//         >
-//             <AuthStack.Screen
-//                 name="Profile"
-//                 component={Profile}
-//                 options={headerOptions}
-//             />
-
-//         </AuthStack.Navigator>
-//     );
-// };
-
 const Details = () => {
   return (
     <DetailsStack.Navigator>

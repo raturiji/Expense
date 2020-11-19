@@ -12,25 +12,39 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../desgin/style';
 import Icon from './Icon';
 import {colorCode} from '../desgin/colorCode';
 import ImagePicker from '../component/ImagePicker';
 
 const Sidebar = ({navigation}) => {
-  const [image, setImage] = useState(null);
+  const userData = useSelector((state) => state.appData.userData);
+  const [user, setUser] = useState(userData);
   const toProfileScreen = () => {
     navigation.navigate('Profile');
   };
-
+  console.log(user && user.Image);
   return (
     <View style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
       <SafeAreaView>
-        <Image
-          style={[inlineStyles.avatar]}
-          source={require('../assets/images/default_user.jpeg')}
-        />
-        <Text style={[inlineStyles.userName]}>Sagar Raturi</Text>
+        {user && user.Image && user.Image !== 'no image' ? (
+          <Image
+            style={[inlineStyles.avatar]}
+            source={{
+              uri: 'file://' + user.Image,
+            }}
+          />
+        ) : (
+          <Image
+            style={[inlineStyles.avatar]}
+            source={require('../assets/images/default_user.jpeg')}
+          />
+        )}
+
+        <Text style={[inlineStyles.userName]}>
+          {user && user.FirstName} {user && user.LastName}
+        </Text>
       </SafeAreaView>
       <View>
         <ListItem title="Profile" active={true} />
@@ -72,11 +86,11 @@ const inlineStyles = StyleSheet.create({
     color: colorCode.light,
   },
   avatar: {
-    backgroundColor: 'red',
     width: wp(20),
     height: wp(20),
     alignSelf: 'center',
     borderRadius: wp(20) / 2,
+    marginTop: wp(4),
   },
   userName: {
     fontStyle: 'italic',

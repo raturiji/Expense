@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -19,6 +20,8 @@ import * as wpActions from '../Store/actions';
 import moment from 'moment';
 import {showMessage} from 'react-native-flash-message';
 import Schema from '../Database/Schema';
+import ImageOptionModal from '../component/ImageOptionModal';
+import {ImagePicker, openGallery} from '../component/ImagePicker';
 import {styles} from '../desgin/style';
 
 const Profile = ({navigation}) => {
@@ -26,6 +29,8 @@ const Profile = ({navigation}) => {
   const [lastName, setLastName] = useState('');
   const [income, setIncome] = useState('');
   const [savings, setSavings] = useState('');
+  const [image, setImage] = useState('no image');
+  const [showModal, setShowModal] = useState(false);
   const [validationError, setValidationError] = useState({});
   const dispatch = useDispatch();
 
@@ -39,7 +44,7 @@ const Profile = ({navigation}) => {
           id,
           FirstName: firstName,
           LastName: lastName,
-          Image: 'asfdsf',
+          Image: image,
           DateOfCreation: moment().format('DD/MM/YYYY'),
           Income: parseInt(income),
           Savings: parseInt(savings),
@@ -48,7 +53,7 @@ const Profile = ({navigation}) => {
           id: realm.objects('Expense').length + 1,
           Title: 'Initial Expense',
           Amount: parseInt(income) - parseInt(savings),
-          Image: 'fghfgh',
+          Image: image,
           Category: 'General',
           DateOfCreation: moment().format('DD/MM/YYYY'),
           User: id,
@@ -136,6 +141,15 @@ const Profile = ({navigation}) => {
         type: 'danger',
       });
     }
+  };
+
+  const fetchImageData = async (option) => {
+    option === 'openCamera' ? ImagePicker(callback) : openGallery(callback);
+  };
+
+  const callback = (res) => {
+    setImage(res.path);
+    setShowModal(false);
   };
 
   return (
@@ -265,11 +279,20 @@ const Profile = ({navigation}) => {
             {validationError.savings.message}
           </Text>
         )}
-      {/* <View style={{height:hp(20),backgroundColor:'white',marginVertical:hp(5),marginHorizontal:wp(30)}}>
-
-            </View> */}
+      {image !== 'no image' && (
+        <Image
+          source={{uri: 'file://' + image}}
+          style={{
+            height: hp(20),
+            backgroundColor: 'white',
+            marginVertical: hp(3),
+            marginHorizontal: wp(30),
+          }}
+        />
+      )}
       <TouchableOpacity
-        style={[inlineStyles.captureBtn, styles.pvSm, styles.mvSm]}>
+        style={[inlineStyles.captureBtn, styles.pvSm, styles.mvSm]}
+        onPress={() => setShowModal(!showModal)}>
         <Text
           style={{
             fontSize: hp(2),
@@ -288,6 +311,9 @@ const Profile = ({navigation}) => {
         onPress={validationData}>
         <Text style={[inlineStyles.submitText]}>Submit</Text>
       </TouchableOpacity>
+      {showModal ? (
+        <ImageOptionModal fetchImage={fetchImageData} close={setShowModal} />
+      ) : null}
     </ScrollView>
   );
 };
