@@ -19,7 +19,6 @@ const Icon = ({name, size, color, iconStyle, close, iconType}) => {
   let Icon;
   switch (iconType) {
     case 'AntDesign':
-      console.log('reach');
       Icon = (
         <AntDesign name={name} size={size} color={color} style={iconStyle} />
       );

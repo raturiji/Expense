@@ -47,7 +47,7 @@ const Payment = ({navigation}) => {
           Image: image,
           Amount: parseInt(amount),
           Category: listItem,
-          DateOfCreation: moment().format('DD/MM/YYYY'),
+          DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
           User: currentProfile.id,
         });
       });

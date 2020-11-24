@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,14 +17,21 @@ import {styles} from '../desgin/style';
 import Icon from './Icon';
 import {colorCode} from '../desgin/colorCode';
 import ImagePicker from '../component/ImagePicker';
+import Realm from 'realm';
+import Schema from '../Database/Schema';
 
 const Sidebar = ({navigation}) => {
   const userData = useSelector((state) => state.appData.userData);
   const [user, setUser] = useState(userData);
-  const toProfileScreen = () => {
-    navigation.navigate('Profile');
-  };
-  console.log(user && user.Image);
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    Realm.open({schema: [Schema.Category]}).then((realm) => {
+      const category = realm
+        .objects('Category')
+        .filtered(`User = ${userData.id}`);
+      setCategories(category);
+    });
+  }, []);
   return (
     <View style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
       <SafeAreaView>
@@ -41,16 +48,14 @@ const Sidebar = ({navigation}) => {
             source={require('../assets/images/default_user.jpeg')}
           />
         )}
-
         <Text style={[inlineStyles.userName]}>
           {user && user.FirstName} {user && user.LastName}
         </Text>
       </SafeAreaView>
       <View>
-        <ListItem title="Profile" active={true} />
-        <ListItem title="Gaming" />
-        <ListItem title="Food" />
-        <ListItem title="Travel" />
+        {categories.map((item) => (
+          <ListItem title={item.name} id={item.id} image={item.Image} />
+        ))}
         <TouchableOpacity
           style={[styles.row, {paddingLeft: wp(4), paddingVertical: hp(2)}]}>
           <Icon iconType="AntDesign" size={20} name="plus" color="white" />
@@ -63,7 +68,7 @@ const Sidebar = ({navigation}) => {
   );
 };
 
-const ListItem = ({onPress, title, active}) => (
+const ListItem = ({onPress, title, active, image, id}) => (
   <TouchableOpacity
     onPress={onPress}
     style={{
@@ -71,15 +76,21 @@ const ListItem = ({onPress, title, active}) => (
       paddingLeft: wp(4),
       paddingVertical: hp(1),
       flexDirection: 'row',
-    }}>
-    <View style={[inlineStyles.profileAvatar]}>
-      <Text style={{color: colorCode.light}}>P</Text>
-    </View>
+    }}
+    key={id}>
+    {image !== 'no image' ? (
+      <Image style={[inlineStyles.profileAvatar]} source={{uri: image}} />
+    ) : (
+      <View style={[inlineStyles.profileAvatar]}>
+        <Text style={{color: colorCode.light}}>{title[0]}</Text>
+      </View>
+    )}
     <View style={{justifyContent: 'center'}}>
       <Text style={[inlineStyles.sideBarItem]}>{title}</Text>
     </View>
   </TouchableOpacity>
 );
+
 const inlineStyles = StyleSheet.create({
   sideBarItem: {
     fontSize: hp(2),
@@ -101,9 +112,9 @@ const inlineStyles = StyleSheet.create({
   profileAvatar: {
     width: wp(12),
     height: wp(12),
+    backgroundColor: 'orange',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'orange',
     marginRight: wp(4),
     borderRadius: wp(12) / 2,
   },

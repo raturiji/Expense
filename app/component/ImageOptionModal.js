@@ -16,7 +16,6 @@ import Icon from '../component/Icon';
 import {ImagePicker, openGallery} from '../component/ImagePicker';
 
 const ImageOptionModal = (props) => {
-  console.log(props, 'testing');
   return (
     <View
       style={{

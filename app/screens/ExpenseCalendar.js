@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ImageBackground,
   ScrollView,
+  Image,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -14,46 +15,74 @@ import {
 import {FAB} from 'react-native-paper';
 import {colorCode} from '../desgin/colorCode';
 import {Calendar} from 'react-native-calendars';
-import ExpenseDetailsModal from '../component/ExpenseDetailsModal';
 import {styles} from '../desgin/style';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import Realm from 'realm';
+import ActionSheet from 'react-native-actions-sheet';
 import {launchCamera} from 'react-native-image-picker';
+import Schema from '../Database/Schema';
+import moment from 'moment';
 
 const ExpenseCalendar = ({navigation}) => {
+  const [selectedDateExpense, setSelectedDateExpense] = useState([]);
+  const [expenseDates, setExpenseDates] = useState(null);
   let camera;
   const nextScreen = () => {
     navigation.navigate('Settings');
   };
 
-  const takePicture = async () => {
-    if (camera) {
-      const options = {quality: 0.5, base64: true};
-      const data = await camera.takePictureAsync(options);
-      console.log(data.uri);
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const expenseListItem = (item) => {
+  const actionSheetRef = useRef();
+
+  const expenseListItem = (item, index) => {
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View
+        style={{flexDirection: 'row', justifyContent: 'space-between'}}
+        key={index}>
         <View style={{flexDirection: 'row'}}>
-          <View
-            style={{
-              width: wp(10),
-              height: wp(10),
-              backgroundColor: 'red',
-              borderRadius: wp(2),
-              margin: wp(2),
-            }}
-          />
-          <Text
-            style={{
-              color: 'white',
-              fontSize: hp(2.5),
-              alignSelf: 'center',
-            }}>
-            Evening Snack
-          </Text>
+          {item.Image !== 'no image' ? (
+            <Image
+              style={{
+                width: wp(10),
+                height: wp(10),
+                backgroundColor: 'red',
+                borderRadius: wp(2),
+                margin: wp(2),
+              }}
+              source={{uri: 'file://' + item.Image}}
+            />
+          ) : (
+            <View
+              style={{
+                width: wp(10),
+                height: wp(10),
+                backgroundColor: 'red',
+                borderRadius: wp(2),
+                margin: wp(2),
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={{color: 'white', fontSize: wp(6)}}>G</Text>
+            </View>
+          )}
+          <View style={[{justifyContent: 'center'}]}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: hp(2.5),
+              }}>
+              {item.Title}
+            </Text>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: hp(2),
+              }}>
+              {moment(item.DateOfCreation).format('HH:mm A')}
+            </Text>
+          </View>
         </View>
         <Text
           style={{
@@ -62,10 +91,71 @@ const ExpenseCalendar = ({navigation}) => {
             alignSelf: 'center',
             marginRight: wp(2),
           }}>
-          &#8377; 2000
+          &#8377; {item.Amount}
         </Text>
       </View>
     );
+  };
+
+  const getExpenseOfThisDate = (date) => {
+    Realm.open({schema: [Schema.Expense]}).then((realm) => {
+      const thisMonthExpense = realm
+        .objects('Expense')
+        .filtered(`DateOfCreation LIKE '${date.dateString}*'`);
+      setSelectedDateExpense(thisMonthExpense);
+      actionSheetRef.current?.setModalVisible(true);
+    });
+  };
+  const fetchData = () => {
+    Realm.open({schema: [Schema.Expense]}).then((realm) => {
+      const expenseData = realm
+        .objects('Expense')
+        .filtered(`DateOfCreation LIKE '${moment().format('YYYY-MM')}*'`);
+      const dates = expenseData.map((item) => {
+        return moment(item.DateOfCreation).format('YYYY-MM-DD');
+      });
+      const distinctDates = [...new Set(dates)];
+      const newDates = {};
+      distinctDates.forEach((item) => {
+        let statusValue = 0;
+        dates.forEach((dbitems) => {
+          if (item.DateOfCreation === dbitems.split(' ')[0]) {
+            statusValue = statusValue + dbitems.Amount;
+          }
+        });
+        newDates[item] =
+          statusValue > 3000
+            ? {
+                customStyles: {
+                  container: {
+                    backgroundColor: 'red',
+                  },
+                  text: {
+                    color: 'white',
+                  },
+                },
+              }
+            : {
+                customStyles: {
+                  container: {
+                    backgroundColor: '#32cd32',
+                  },
+                  text: {
+                    color: 'white',
+                  },
+                },
+              };
+      });
+      setExpenseDates(newDates);
+    });
+  };
+
+  const totalExpenseDays = () => {
+    let count = 0;
+    for (const value in expenseDates) {
+      count = count + 1;
+    }
+    return count;
   };
 
   return (
@@ -73,85 +163,87 @@ const ExpenseCalendar = ({navigation}) => {
       <Calendar
         markingType={'custom'}
         markedDates={{
-          '2020-09-22': {
-            customStyles: {
-              container: {
-                backgroundColor: 'orange',
-              },
-              text: {
-                color: 'white',
-              },
-            },
+          ...expenseDates,
+          [moment().format('YYYY-MM-DD')]: {
+            selected: true,
+            marked: true,
+            selectedColor: 'red',
           },
-          '2020-09-23': {
-            customStyles: {
-              container: {
-                backgroundColor: 'white',
-                elevation: 2,
-              },
-              text: {
-                color: 'blue',
-              },
-            },
-          },
+        }}
+        onDayPress={(date) => {
+          getExpenseOfThisDate(date);
         }}
       />
-      {/* <RNCamera
-        ref={(ref) => {
-          camera = ref;
-        }}
-        style={inlineStyles.preview}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
-      /> */}
-      <ImageBackground
-        style={{width: wp(100), height: hp(100)}}
-        source={require('../assets/images/background3.jpg')}>
-        <View style={[styles.row]}>
-          <Text
-            style={{
-              fontStyle: 'oblique',
-              fontSize: wp(5),
-              paddingHorizontal: 20,
-              marginVertical: 20,
-              color: 'white',
-              width: wp(80),
-            }}>
-            Total days on which you spend money of this category.
-          </Text>
-          <View style={[inlineStyles.avatar]}>
-            <Text style={{fontSize: hp(4), color: 'white'}}>20</Text>
+      <View style={{padding: wp(4), backgroundColor: '#FFFF99'}}>
+        <Text style={{fontSize: wp(8)}}>Note</Text>
+        <Text style={{fontSize: wp(4), marginBottom: wp(2)}}>
+          1- Please click on the the date to get the list of expenses of that
+          day.
+        </Text>
+        <Text style={{fontSize: wp(4), marginBottom: wp(2)}}>
+          2- Red highlighted dates means those dates on which you have pass
+          through your daily expense threshold.
+        </Text>
+        <Text style={{fontSize: wp(4), marginBottom: wp(2)}}>
+          3- Green highlighted dates means those dates on which you have not
+          pass through your daily expense threshold.
+        </Text>
+        <Text style={{fontSize: wp(4), marginBottom: wp(2)}}>
+          4- No highlighted dates means those dates on which you have not any
+          expense.
+        </Text>
+        <Text />
+      </View>
+      <ActionSheet ref={actionSheetRef}>
+        <ImageBackground
+          style={{width: wp(100), height: hp(75)}}
+          source={require('../assets/images/background3.jpg')}>
+          <View style={[styles.row]}>
+            <Text
+              style={{
+                fontStyle: 'oblique',
+                fontSize: wp(5),
+                paddingHorizontal: 20,
+                marginVertical: 20,
+                color: 'white',
+                width: wp(80),
+              }}>
+              Total days on which you spend money of this category.
+            </Text>
+            <View style={[inlineStyles.avatar]}>
+              <Text style={{fontSize: hp(4), color: 'white'}}>
+                {totalExpenseDays()}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View
-          style={[
-            styles.row,
-            {
-              justifyContent: 'space-between',
-              paddingVertical: hp(2),
-              marginHorizontal: wp(2),
-              borderBottomWidth: 1,
-              borderColor: '#e3e3e3',
-            },
-          ]}>
-          <Text style={{fontSize: hp(3), color: 'white'}}>Total</Text>
-          <Text style={{fontSize: hp(2.5), color: 'white'}}>&#8377; 2000</Text>
-        </View>
-        <ScrollView>
-          {expenseListItem()}
-          {expenseListItem()}
-          {expenseListItem()}
-          {expenseListItem()}
-          {expenseListItem()}
-          {expenseListItem()}
-        </ScrollView>
-      </ImageBackground>
+          <View
+            style={[
+              styles.row,
+              {
+                justifyContent: 'space-between',
+                paddingVertical: hp(2),
+                marginHorizontal: wp(2),
+                borderBottomWidth: 1,
+                borderColor: '#e3e3e3',
+              },
+            ]}>
+            <Text style={{fontSize: hp(3), color: 'white'}}>Total</Text>
+            <Text style={{fontSize: hp(2.5), color: 'white'}}>
+              &#8377;{' '}
+              {selectedDateExpense.length
+                ? selectedDateExpense
+                    .map((item) => item.Amount)
+                    .reduce((a, b) => a + b)
+                : 0}
+            </Text>
+          </View>
+          <ScrollView>
+            {selectedDateExpense.map((item, index) =>
+              expenseListItem(item, index),
+            )}
+          </ScrollView>
+        </ImageBackground>
+      </ActionSheet>
       <FAB
         icon="plus"
         animated={true}
@@ -161,7 +253,7 @@ const ExpenseCalendar = ({navigation}) => {
           right: wp(6),
           bottom: hp(5),
         }}
-        onPress={launchCamera}
+        onPress={() => actionSheetRef.current?.setModalVisible()}
       />
     </View>
   );

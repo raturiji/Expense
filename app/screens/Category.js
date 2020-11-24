@@ -24,7 +24,7 @@ import ImageOptionModal from '../component/ImageOptionModal';
 import {ImagePicker, openGallery} from '../component/ImagePicker';
 import {styles} from '../desgin/style';
 
-const Profile = ({navigation}) => {
+const Category = ({navigation}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [income, setIncome] = useState('');
@@ -156,9 +156,9 @@ const Profile = ({navigation}) => {
     <ScrollView>
       <Text style={[inlineStyles.heading]}>Profile Details</Text>
       <TextInput
-        label="First Name"
+        label="Category Name"
         mode="outlined"
-        placeholder="Enter your First Name"
+        placeholder="Enter your category name"
         onChangeText={(text) => setFirstName(text)}
         style={{marginHorizontal: wp(4)}}
       />
@@ -336,4 +336,4 @@ const inlineStyles = StyleSheet.create({
   },
 });
 
-export default Profile;
+export default Category;

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -14,9 +14,8 @@ import ExpenseCalendar from '../screens/ExpenseCalendar';
 import Payment from '../screens/Payment';
 import Settings from '../screens/Settings';
 import Profile from '../screens/Profile';
-import Realm from 'realm';
+import {useSelector, useDispatch} from 'react-redux';
 import Icon from '../component/Icon';
-import Schema from '../Database/Schema';
 
 const Drawer = createDrawerNavigator();
 const AppStack = createStackNavigator();
@@ -25,16 +24,6 @@ const DetailsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppScreen = ({navigation}) => {
-  useEffect(() => {
-    Realm.open({
-      schema: [Schema.User],
-    }).then((realm) =>
-      realm.objects('User').length > 0
-        ? navigation.navigate('Dashboard')
-        : null,
-    );
-  }, [navigation]);
-
   return (
     <AppStack.Navigator
       screenOptions={{
@@ -56,11 +45,6 @@ const AppScreen = ({navigation}) => {
         gestureEnabled: false,
       }}>
       <AppStack.Screen
-        name="Profile"
-        component={Profile}
-        options={headerOptions}
-      />
-      <AppStack.Screen
         name="Dashboard"
         component={Dashboard}
         options={headerOptions}
@@ -71,6 +55,18 @@ const AppScreen = ({navigation}) => {
         options={headerOptions}
       />
     </AppStack.Navigator>
+  );
+};
+
+const AuthScreen = ({navigation}) => {
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        name="Profile"
+        component={Profile}
+        options={headerOptions}
+      />
+    </AuthStack.Navigator>
   );
 };
 
@@ -133,11 +129,18 @@ const Tabs = () => {
   );
 };
 
-const Routes = () => {
-  return (
+const Routes = ({navigation}) => {
+  const userData = useSelector((state) => state.appData.userData);
+  return userData && userData.id ? (
     <Drawer.Navigator drawerContent={(props) => <Sidebar {...props} />}>
-      <Drawer.Screen name="Profile" component={Tabs} options={headerOptions} />
+      <Drawer.Screen
+        name="Dashboard"
+        component={Tabs}
+        options={headerOptions}
+      />
     </Drawer.Navigator>
+  ) : (
+    <AuthScreen />
   );
 };
 
