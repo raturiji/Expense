@@ -57,7 +57,8 @@ const Sidebar = ({navigation}) => {
           <ListItem title={item.name} id={item.id} image={item.Image} />
         ))}
         <TouchableOpacity
-          style={[styles.row, {paddingLeft: wp(4), paddingVertical: hp(2)}]}>
+          style={[styles.row, {paddingLeft: wp(4), paddingVertical: hp(2)}]}
+          onPress={() => navigation.navigate('Category')}>
           <Icon iconType="AntDesign" size={20} name="plus" color="white" />
           <Text style={{color: 'white', marginHorizontal: wp(2)}}>
             Add Category

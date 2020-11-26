@@ -37,21 +37,33 @@ const Payment = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
 
   const makePayment = () => {
-    Realm.open({schema: [Schema.User, Schema.Expense]}).then((realm) => {
-      realm.write(() => {
-        realm.create('Expense', {
-          id:
-            realm.objects('Expense')[realm.objects('Expense').length - 1].id +
-            1,
-          Title: paymentTitle,
-          Image: image,
-          Amount: parseInt(amount),
-          Category: listItem,
-          DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          User: currentProfile.id,
+    Realm.open({schema: [Schema.User, Schema.Expense, Schema.Category]}).then(
+      (realm) => {
+        const category = realm
+          .objects('Category')
+          .filtered(`name = '${listItem}'`);
+        const totalAmount = category[0].TotalAmount + parseInt(amount);
+        realm.write(() => {
+          console.log(category,'reaching')
+          realm.create('Expense', {
+            id:
+              realm.objects('Expense')[realm.objects('Expense').length - 1].id +
+              1,
+            Title: paymentTitle,
+            Image: image,
+            Amount: parseInt(amount),
+            Category: listItem,
+            DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
+            User: currentProfile.id,
+          });
+          realm.create(
+            'Category',
+            {id: category[0].id, TotalAmount: totalAmount},
+            'modified',
+          );
         });
-      });
-    });
+      },
+    );
     navigation.goBack();
   };
 

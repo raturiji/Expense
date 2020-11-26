@@ -14,6 +14,7 @@ import ExpenseCalendar from '../screens/ExpenseCalendar';
 import Payment from '../screens/Payment';
 import Settings from '../screens/Settings';
 import Profile from '../screens/Profile';
+import Category from '../screens/Category';
 import {useSelector, useDispatch} from 'react-redux';
 import Icon from '../component/Icon';
 
@@ -52,6 +53,11 @@ const AppScreen = ({navigation}) => {
       <AppStack.Screen
         name="Payment"
         component={Payment}
+        options={headerOptions}
+      />
+      <AppStack.Screen
+        name="Category"
+        component={Category}
         options={headerOptions}
       />
     </AppStack.Navigator>

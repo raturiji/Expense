@@ -28,6 +28,8 @@ const Dashboard = ({navigation}) => {
   const [user, setUser] = useState(userData);
   const [data, setData] = useState([]);
   const [saving, setSaving] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [details, setDetails] = useState(false);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       user &&
@@ -39,6 +41,7 @@ const Dashboard = ({navigation}) => {
         setData(realm.objects('Expense'));
       });
       PresentSaving();
+      fetchCategories();
     });
     return unsubscribe;
   }, [navigation]);
@@ -50,7 +53,7 @@ const Dashboard = ({navigation}) => {
     Realm.open({schema: [Schema.Expense]}).then((realm) => {
       const thisMonthExpense = realm
         .objects('Expense')
-        .filtered(`DateOfCreation LIKE '${moment().format('YYYY-MM-DD')}*' `);
+        .filtered(`DateOfCreation LIKE '${moment().format('YYYY-MM')}*' `);
       let thisMonthSaving =
         user.Income -
         thisMonthExpense.map((item) => item.Amount).reduce((a, b) => a + b);
@@ -58,6 +61,37 @@ const Dashboard = ({navigation}) => {
     });
   };
 
+  const fetchCategories = () => {
+    Realm.open({schema: [Schema.Category]}).then((realm) => {
+      const category = realm
+        .objects('Category')
+        .filtered(`User = ${userData.id}`);
+      setCategories(category);
+    });
+  };
+
+  // const totalAmount = async (category) => {
+  //   const amount = await Realm.open({schema: [Schema.Expense]}).then(
+  //     (realm) => {
+  //       const categoryData = realm
+  //         .objects('Expense')
+  //         .filtered(
+  //           `Category == '${category}' AND DateOfCreation LIKE '${moment().format(
+  //             'YYYY-MM',
+  //           )}*'`,
+  //         );
+  //       const categoryAmount =
+  //         categoryData.length === 1
+  //           ? categoryData[0].Amount
+  //           : categoryData.map((item) => item.Amount).reduce((a, b) => a + b);
+  //       console.log(categoryAmount, 'retest');
+  //       return categoryAmount;
+  //     },
+  //   );
+  //   console.log(amount, 'testing');
+  //   return amount;
+  // };
+  // console.log(totalAmount(), 'checking');
   const ExpensePercentage = ((user.Income - saving) / user.Income) * 100;
   const SavingPercentage = (saving / user.Income) * 100;
 
@@ -195,11 +229,56 @@ const Dashboard = ({navigation}) => {
                 ]}>
                 You are few bucks away to reach your goal
               </Text>
-              <View style={[inlineStyles.detailsBtn, styles.row, styles.ctr]}>
-                <Text style={[{color: colorCode.light}]}>View Details</Text>
-              </View>
+              <TouchableOpacity
+                style={[inlineStyles.detailsBtn, styles.row, styles.ctr]}
+                onPress={() => setDetails(!details)}>
+                <Text style={[{color: colorCode.light}]}>
+                  {details ? 'Hide Details' : 'View Details'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
+          {details ? (
+            <View style={[styles.mvSm]}>
+              {categories.map((category) => (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: wp(4),
+                  }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={[inlineStyles.profileAvatar]}>
+                      <Text style={{color: colorCode.light}}>
+                        {category.name[0]}
+                      </Text>
+                    </View>
+                    <View style={{justifyContent: 'center'}}>
+                      <Text
+                        style={[
+                          {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            textTransform: 'uppercase',
+                          },
+                        ]}>
+                        {category.name}
+                      </Text>
+                      <Text style={{fontWeight: 'bold', color: 'grey'}}>
+                        43%
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{justifyContent: 'center'}}>
+                    <Text
+                      style={{fontWeight: 'bold', fontSize: 18, color: 'gray'}}>
+                      &#8377;{category.TotalAmount}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
         <View
           style={[
@@ -251,7 +330,7 @@ const inlineStyles = StyleSheet.create({
     letterSpacing: 1.2,
   },
   detailsBtn: {
-    backgroundColor: 'orange',
+    backgroundColor: '#FF8243',
     width: wp(28),
     padding: wp(1),
     borderRadius: 50,
@@ -272,6 +351,15 @@ const inlineStyles = StyleSheet.create({
     fontSize: hp(3),
     fontWeight: 'bold',
     textAlign: 'right',
+  },
+  profileAvatar: {
+    width: wp(12),
+    height: wp(12),
+    backgroundColor: 'orange',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: wp(4),
+    borderRadius: wp(12) / 2,
   },
   paymentBtn: {
     backgroundColor: '#008080',

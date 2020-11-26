@@ -25,10 +25,6 @@ import moment from 'moment';
 const ExpenseCalendar = ({navigation}) => {
   const [selectedDateExpense, setSelectedDateExpense] = useState([]);
   const [expenseDates, setExpenseDates] = useState(null);
-  let camera;
-  const nextScreen = () => {
-    navigation.navigate('Settings');
-  };
 
   useEffect(() => {
     fetchData();

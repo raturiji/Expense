@@ -15,6 +15,7 @@ import {
 import {colorCode} from '../desgin/colorCode';
 import {TextInput} from 'react-native-paper';
 import Realm from 'realm';
+import Icon from '../component/Icon';
 import {useSelector, useDispatch} from 'react-redux';
 import * as wpActions from '../Store/actions';
 import moment from 'moment';
@@ -25,109 +26,56 @@ import {ImagePicker, openGallery} from '../component/ImagePicker';
 import {styles} from '../desgin/style';
 
 const Category = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [income, setIncome] = useState('');
-  const [savings, setSavings] = useState('');
+  const [title, setTitle] = useState('');
   const [image, setImage] = useState('no image');
+  const [threshold, setThreshold] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [validationError, setValidationError] = useState({});
+  const user = useSelector((state) => state.appData.userData);
   const dispatch = useDispatch();
 
   const createProfile = () => {
     Realm.open({
       schema: [Schema.User, Schema.Expense, Schema.Income, Schema.Category],
     }).then((realm) => {
-      const id = realm.objects('User').length + 1;
+      const id = realm.objects('Category').length + 1;
       realm.write(() => {
-        realm.create('User', {
+        realm.create('Category', {
           id,
-          FirstName: firstName,
-          LastName: lastName,
+          name: title,
           Image: image,
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          Income: parseInt(income),
-          Savings: parseInt(savings),
-        });
-        realm.create('Expense', {
-          id: realm.objects('Expense').length + 1,
-          Title: 'Initial Expense',
-          Amount: parseInt(income) - parseInt(savings),
-          Image: 'no image',
-          Category: 'General',
-          DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          User: id,
-        });
-        realm.create('Income', {
-          id: realm.objects('Income').length + 1,
-          Title: 'Initial Savings',
-          Amount: parseInt(savings),
-          Image: 'no image',
-          DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          User: id,
-        });
-        realm.create('Category', {
-          id: realm.objects('Income').length + 1,
-          name: 'General',
-          TotalAmount: 0,
-          Image: 'no image',
-          DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          User: id,
+          TotalAmount: parseInt(threshold),
+          User: user.id,
         });
       });
-
-      dispatch(wpActions.saveUser(realm.objects('User')[0]));
     });
   };
 
   const validationData = () => {
     const error = {};
-    if (firstName === '') {
-      error.firstName = {
+    if (title === '') {
+      error.title = {
         type: 'required',
-        message: 'Please enter your first name. It is a required field.',
+        message: 'Please enter your category title It is a required field.',
       };
     }
-    if (firstName.length >= 60) {
-      error.firstName = {
+    if (title.length >= 60) {
+      error.title = {
         type: 'strength',
-        message: 'Please enter first name in between 1 - 60',
+        message: 'Please enter category title in between 1 - 60',
       };
     }
-    if (lastName === '') {
-      error.lastName = {
+    if (threshold === '') {
+      error.threshold = {
         type: 'required',
-        message: 'Please enter your last name. It is a required field.',
+        message: 'Please enter your threshold. It is a required field.',
       };
     }
-    if (lastName.length >= 60) {
-      error.lastName = {
-        type: 'strength',
-        message: 'Please enter last name in between 1 - 60',
-      };
-    }
-    if (income === '') {
-      error.income = {
-        type: 'required',
-        message: 'Please enter your income. It is a required field.',
-      };
-    }
-    if (isNaN(income)) {
-      error.income = {
+    if (isNaN(threshold)) {
+      error.threshold = {
         type: 'invalid',
-        message: 'Please enter valid income input in this field.',
-      };
-    }
-    if (savings === '') {
-      error.savings = {
-        type: 'required',
-        message: 'Please enter your savings. It is a required field.',
-      };
-    }
-    if (isNaN(savings)) {
-      error.savings = {
-        type: 'invalid',
-        message: 'Please enter valid savings input in this field.',
+        message: 'Please enter valid threshold input in this field.',
       };
     }
     if (Object.keys(error).length === 0) {
@@ -154,129 +102,67 @@ const Category = ({navigation}) => {
 
   return (
     <ScrollView>
-      <Text style={[inlineStyles.heading]}>Profile Details</Text>
+      <Text style={[inlineStyles.heading]}>Category Details</Text>
       <TextInput
         label="Category Name"
         mode="outlined"
         placeholder="Enter your category name"
-        onChangeText={(text) => setFirstName(text)}
+        onChangeText={(text) => setTitle(text)}
         style={{marginHorizontal: wp(4)}}
       />
       {validationError &&
-        validationError.firstName &&
-        validationError.firstName.type === 'required' && (
+        validationError.title &&
+        validationError.title.type === 'required' && (
           <Text
             style={{
               marginHorizontal: wp(5),
               color: colorCode.danger,
               marginVertical: hp(1),
             }}>
-            {validationError.firstName.message}
+            {validationError.title.message}
           </Text>
         )}
       {validationError &&
-        validationError.firstName &&
-        validationError.firstName.type === 'strength' && (
+        validationError.title &&
+        validationError.title.type === 'strength' && (
           <Text
             style={{
               marginHorizontal: wp(5),
               color: colorCode.danger,
               marginVertical: hp(1),
             }}>
-            {validationError.firstName.message}
+            {validationError.title.message}
           </Text>
         )}
       <TextInput
-        label="Last Name"
+        label="Category Threshold"
         mode="outlined"
-        placeholder="Enter your Last Name"
-        onChangeText={(text) => setLastName(text)}
+        placeholder="Enter your category threshold amount"
+        onChangeText={(text) => setThreshold(text)}
         style={{marginHorizontal: wp(4)}}
       />
       {validationError &&
-        validationError.lastName &&
-        validationError.lastName.type === 'required' && (
+        validationError.threshold &&
+        validationError.threshold.type === 'required' && (
           <Text
             style={{
               marginHorizontal: wp(5),
               color: colorCode.danger,
               marginVertical: hp(1),
             }}>
-            {validationError.lastName.message}
+            {validationError.threshold.message}
           </Text>
         )}
       {validationError &&
-        validationError.lastName &&
-        validationError.lastName.type === 'strength' && (
+        validationError.threshold &&
+        validationError.threshold.type === 'invalid' && (
           <Text
             style={{
               marginHorizontal: wp(5),
               color: colorCode.danger,
               marginVertical: hp(1),
             }}>
-            {validationError.lastName.message}
-          </Text>
-        )}
-      <TextInput
-        label="Income"
-        mode="outlined"
-        placeholder="Enter your income"
-        onChangeText={(text) => setIncome(text)}
-        style={{marginHorizontal: wp(4)}}
-      />
-      {validationError &&
-        validationError.income &&
-        validationError.income.type === 'required' && (
-          <Text
-            style={{
-              marginHorizontal: wp(5),
-              color: colorCode.danger,
-              marginVertical: hp(1),
-            }}>
-            {validationError.income.message}
-          </Text>
-        )}
-      {validationError &&
-        validationError.income &&
-        validationError.income.type === 'invalid' && (
-          <Text
-            style={{
-              marginHorizontal: wp(5),
-              color: colorCode.danger,
-              marginVertical: hp(1),
-            }}>
-            {validationError.income.message}
-          </Text>
-        )}
-      <TextInput
-        label="Savings"
-        mode="outlined"
-        placeholder="Enter your savings"
-        onChangeText={(text) => setSavings(text)}
-        style={{marginHorizontal: wp(4)}}
-      />
-      {validationError &&
-        validationError.savings &&
-        validationError.savings.type === 'required' && (
-          <Text
-            style={{
-              marginHorizontal: wp(5),
-              color: colorCode.danger,
-              marginVertical: hp(1),
-            }}>
-            {validationError.savings.message}
-          </Text>
-        )}
-      {validationError &&
-        validationError.savings &&
-        validationError.savings.type === 'invalid' && (
-          <Text
-            style={{
-              marginHorizontal: wp(5),
-              color: colorCode.danger,
-              marginVertical: hp(1),
-            }}>
-            {validationError.savings.message}
+            {validationError.threshold.message}
           </Text>
         )}
       {image !== 'no image' && (
@@ -291,15 +177,25 @@ const Category = ({navigation}) => {
         />
       )}
       <TouchableOpacity
-        style={[inlineStyles.captureBtn, styles.pvSm, styles.mvSm]}
-        onPress={() => setShowModal(!showModal)}>
+        style={[inlineStyles.captureBtn, styles.row]}
+        onPress={() => setShowModal(true)}>
+        <Icon iconType="FontAwesome" name="camera" size={40} color="grey" />
         <Text
           style={{
             fontSize: hp(2),
             textAlign: 'center',
-            color: colorCode.light,
+            marginHorizontal: wp(2),
+            color: colorCode.dark,
           }}>
           Capture Image
+          <Text
+            style={{
+              fontSize: hp(1.5),
+              textAlign: 'center',
+              color: colorCode.DarkGray,
+            }}>
+            (Optional)
+          </Text>
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -314,6 +210,11 @@ const Category = ({navigation}) => {
       {showModal ? (
         <ImageOptionModal fetchImage={fetchImageData} close={setShowModal} />
       ) : null}
+      <TouchableOpacity
+        onPress={navigation.goBack}
+        style={[inlineStyles.cancelBtn]}>
+        <Text style={[inlineStyles.submitText]}>Cancel</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -325,14 +226,23 @@ const inlineStyles = StyleSheet.create({
     marginVertical: hp(4),
   },
   captureBtn: {
-    backgroundColor: colorCode.danger,
     borderRadius: 25,
-    marginHorizontal: wp(32),
+    alignSelf: 'center',
+    marginVertical: hp(5),
   },
   submitText: {
     fontSize: hp(2),
     textAlign: 'center',
     color: colorCode.light,
+  },
+  cancelBtn: {
+    fontSize: hp(2),
+    textAlign: 'center',
+    backgroundColor: 'tomato',
+    alignSelf: 'center',
+    padding: wp(2),
+    borderRadius: 50,
+    marginBottom: hp(5),
   },
 });
 

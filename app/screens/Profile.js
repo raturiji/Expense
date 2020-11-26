@@ -69,7 +69,7 @@ const Profile = ({navigation}) => {
         realm.create('Category', {
           id: realm.objects('Income').length + 1,
           name: 'General',
-          TotalAmount: 0,
+          TotalAmount: parseInt(income) - parseInt(savings),
           Image: 'no image',
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
           User: id,
