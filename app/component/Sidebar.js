@@ -16,7 +16,6 @@ import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../desgin/style';
 import Icon from './Icon';
 import {colorCode} from '../desgin/colorCode';
-import ImagePicker from '../component/ImagePicker';
 import Realm from 'realm';
 import Schema from '../Database/Schema';
 
@@ -24,6 +23,7 @@ const Sidebar = ({navigation}) => {
   const userData = useSelector((state) => state.appData.userData);
   const [user, setUser] = useState(userData);
   const [categories, setCategories] = useState([]);
+
   useEffect(() => {
     Realm.open({schema: [Schema.Category]}).then((realm) => {
       const category = realm
@@ -32,6 +32,14 @@ const Sidebar = ({navigation}) => {
       setCategories(category);
     });
   }, []);
+
+  const backToDashboard = () => {
+    navigation.navigate('Dashboard');
+  };
+
+  const openCategoryDetails = (category) => {
+    navigation.navigate('CategoryDetails', {name: category});
+  };
   return (
     <View style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
       <SafeAreaView>
@@ -54,7 +62,16 @@ const Sidebar = ({navigation}) => {
       </SafeAreaView>
       <View>
         {categories.map((item) => (
-          <ListItem title={item.name} id={item.id} image={item.Image} />
+          <ListItem
+            title={item.name}
+            key={item.id}
+            image={item.Image}
+            onPress={
+              item.name === 'General'
+                ? backToDashboard
+                : () => openCategoryDetails(item.name)
+            }
+          />
         ))}
         <TouchableOpacity
           style={[styles.row, {paddingLeft: wp(4), paddingVertical: hp(2)}]}
@@ -69,28 +86,30 @@ const Sidebar = ({navigation}) => {
   );
 };
 
-const ListItem = ({onPress, title, active, image, id}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={{
-      backgroundColor: active ? '#f57e16' : null,
-      paddingLeft: wp(4),
-      paddingVertical: hp(1),
-      flexDirection: 'row',
-    }}
-    key={id}>
-    {image !== 'no image' ? (
-      <Image style={[inlineStyles.profileAvatar]} source={{uri: image}} />
-    ) : (
-      <View style={[inlineStyles.profileAvatar]}>
-        <Text style={{color: colorCode.light}}>{title[0]}</Text>
+const ListItem = ({onPress, title, active, image}) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        backgroundColor: active ? '#f57e16' : null,
+        paddingLeft: wp(4),
+        paddingVertical: hp(1),
+        flexDirection: 'row',
+      }}
+      key={4}>
+      {image !== 'no image' ? (
+        <Image style={[inlineStyles.profileAvatar]} source={{uri: image}} />
+      ) : (
+        <View style={[inlineStyles.profileAvatar]}>
+          <Text style={{color: colorCode.light}}>{title[0]}</Text>
+        </View>
+      )}
+      <View style={{justifyContent: 'center'}}>
+        <Text style={[inlineStyles.sideBarItem]}>{title}</Text>
       </View>
-    )}
-    <View style={{justifyContent: 'center'}}>
-      <Text style={[inlineStyles.sideBarItem]}>{title}</Text>
-    </View>
-  </TouchableOpacity>
-);
+    </TouchableOpacity>
+  );
+};
 
 const inlineStyles = StyleSheet.create({
   sideBarItem: {

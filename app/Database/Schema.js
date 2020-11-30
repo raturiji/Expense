@@ -46,6 +46,7 @@ const Schema = {
       DateOfCreation: 'string',
       Image: 'string',
       User: 'int',
+      Threshold: 'int',
       TotalAmount: 'int',
     },
   },

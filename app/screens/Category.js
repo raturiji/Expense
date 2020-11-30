@@ -34,7 +34,7 @@ const Category = ({navigation}) => {
   const user = useSelector((state) => state.appData.userData);
   const dispatch = useDispatch();
 
-  const createProfile = () => {
+  const createCategory = () => {
     Realm.open({
       schema: [Schema.User, Schema.Expense, Schema.Income, Schema.Category],
     }).then((realm) => {
@@ -45,10 +45,12 @@ const Category = ({navigation}) => {
           name: title,
           Image: image,
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
-          TotalAmount: parseInt(threshold),
+          Threshold: parseInt(threshold),
+          TotalAmount: 0,
           User: user.id,
         });
       });
+      navigation.navigate('Dashboard');
     });
   };
 
@@ -78,8 +80,14 @@ const Category = ({navigation}) => {
         message: 'Please enter valid threshold input in this field.',
       };
     }
+    if (parseInt(threshold) < 100) {
+      error.threshold = {
+        type: 'strength',
+        message: 'Please enter amount greater than 100',
+      };
+    }
     if (Object.keys(error).length === 0) {
-      createProfile();
+      createCategory();
     } else {
       setValidationError(error);
       showMessage({
@@ -156,6 +164,18 @@ const Category = ({navigation}) => {
       {validationError &&
         validationError.threshold &&
         validationError.threshold.type === 'invalid' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.threshold.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.threshold &&
+        validationError.threshold.type === 'strength' && (
           <Text
             style={{
               marginHorizontal: wp(5),

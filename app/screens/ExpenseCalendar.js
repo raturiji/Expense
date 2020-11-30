@@ -197,7 +197,6 @@ const ExpenseCalendar = ({navigation}) => {
           <View style={[styles.row]}>
             <Text
               style={{
-                fontStyle: 'oblique',
                 fontSize: wp(5),
                 paddingHorizontal: 20,
                 marginVertical: 20,

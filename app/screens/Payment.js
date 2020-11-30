@@ -35,6 +35,7 @@ const Payment = ({navigation}) => {
   const [expanded, setExpanded] = useState(false);
   const [image, setImage] = useState('no image');
   const [showModal, setShowModal] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const makePayment = () => {
     Realm.open({schema: [Schema.User, Schema.Expense, Schema.Category]}).then(
@@ -44,7 +45,6 @@ const Payment = ({navigation}) => {
           .filtered(`name = '${listItem}'`);
         const totalAmount = category[0].TotalAmount + parseInt(amount);
         realm.write(() => {
-          console.log(category,'reaching')
           realm.create('Expense', {
             id:
               realm.objects('Expense')[realm.objects('Expense').length - 1].id +

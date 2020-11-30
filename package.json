@@ -29,6 +29,7 @@
     "react-native-image-picker": "^2.3.4",
     "react-native-paper": "^4.2.0",
     "react-native-pie": "^1.1.2",
+    "react-native-pure-chart": "^0.0.24",
     "react-native-reanimated": "^1.13.0",
     "react-native-responsive-screen": "^1.4.1",
     "react-native-safe-area-context": "^3.1.7",

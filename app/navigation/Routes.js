@@ -17,6 +17,7 @@ import Profile from '../screens/Profile';
 import Category from '../screens/Category';
 import {useSelector, useDispatch} from 'react-redux';
 import Icon from '../component/Icon';
+import CategoryDetails from '../screens/CategoryDetails';
 
 const Drawer = createDrawerNavigator();
 const AppStack = createStackNavigator();
@@ -58,6 +59,11 @@ const AppScreen = ({navigation}) => {
       <AppStack.Screen
         name="Category"
         component={Category}
+        options={headerOptions}
+      />
+      <AppStack.Screen
+        name="CategoryDetails"
+        component={CategoryDetails}
         options={headerOptions}
       />
     </AppStack.Navigator>
@@ -139,11 +145,7 @@ const Routes = ({navigation}) => {
   const userData = useSelector((state) => state.appData.userData);
   return userData && userData.id ? (
     <Drawer.Navigator drawerContent={(props) => <Sidebar {...props} />}>
-      <Drawer.Screen
-        name="Dashboard"
-        component={Tabs}
-        options={headerOptions}
-      />
+      <Drawer.Screen name="Tabs" component={Tabs} options={headerOptions} />
     </Drawer.Navigator>
   ) : (
     <AuthScreen />

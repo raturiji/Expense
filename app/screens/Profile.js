@@ -50,7 +50,7 @@ const Profile = ({navigation}) => {
           Savings: parseInt(savings),
         });
         realm.create('Expense', {
-          id: realm.objects('Expense').length + 1,
+          id: 1,
           Title: 'Initial Expense',
           Amount: parseInt(income) - parseInt(savings),
           Image: 'no image',
@@ -59,7 +59,7 @@ const Profile = ({navigation}) => {
           User: id,
         });
         realm.create('Income', {
-          id: realm.objects('Income').length + 1,
+          id: 1,
           Title: 'Initial Savings',
           Amount: parseInt(savings),
           Image: 'no image',
@@ -67,11 +67,12 @@ const Profile = ({navigation}) => {
           User: id,
         });
         realm.create('Category', {
-          id: realm.objects('Income').length + 1,
+          id: 1,
           name: 'General',
           TotalAmount: parseInt(income) - parseInt(savings),
           Image: 'no image',
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
+          Threshold: 0,
           User: id,
         });
       });

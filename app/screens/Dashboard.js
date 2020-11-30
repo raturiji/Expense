@@ -240,13 +240,15 @@ const Dashboard = ({navigation}) => {
           </View>
           {details ? (
             <View style={[styles.mvSm]}>
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     paddingHorizontal: wp(4),
-                  }}>
+                    marginVertical: wp(2),
+                  }}
+                  key={index}>
                   <View style={{flexDirection: 'row'}}>
                     <View style={[inlineStyles.profileAvatar]}>
                       <Text style={{color: colorCode.light}}>
@@ -265,7 +267,7 @@ const Dashboard = ({navigation}) => {
                         {category.name}
                       </Text>
                       <Text style={{fontWeight: 'bold', color: 'grey'}}>
-                        43%
+                        {(category.TotalAmount / user.Income) * 100}%
                       </Text>
                     </View>
                   </View>

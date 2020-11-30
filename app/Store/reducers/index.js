@@ -1,7 +1,8 @@
-import {SAVE_USER} from '../actions/types';
+import {SAVE_USER, USER_CATEGORIES} from '../actions/types';
 
 const initialState = {
   userData: null,
+  categories: [],
 };
 
 const Reducer = (state = initialState, action) => {
@@ -10,6 +11,11 @@ const Reducer = (state = initialState, action) => {
       return {
         ...state,
         userData: action.payload,
+      };
+    case USER_CATEGORIES:
+      return {
+        ...state,
+        categories: action.payload,
       };
     default:
       return state;
