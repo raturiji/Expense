@@ -48,6 +48,7 @@ const Schema = {
       User: 'int',
       Threshold: 'int',
       TotalAmount: 'int',
+      avatarColor: 'string',
     },
   },
 };

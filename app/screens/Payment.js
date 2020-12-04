@@ -31,18 +31,25 @@ const Payment = ({navigation}) => {
   const [amount, setAmount] = useState('');
   const [validationError, setValidationError] = useState(null);
   const currentProfile = useSelector((state) => state.appData.userData);
-  const [listItem, setListItem] = useState('Category');
+  const [listItem, setListItem] = useState({name: 'Category'});
   const [expanded, setExpanded] = useState(false);
   const [image, setImage] = useState('no image');
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    Realm.open({schema: [Schema.Category]}).then((realm) => {
+      const category = realm.objects('Category');
+      setCategories(category);
+    });
+  }, []);
 
   const makePayment = () => {
     Realm.open({schema: [Schema.User, Schema.Expense, Schema.Category]}).then(
       (realm) => {
         const category = realm
           .objects('Category')
-          .filtered(`name = '${listItem}'`);
+          .filtered(`name = '${listItem.name}'`);
         const totalAmount = category[0].TotalAmount + parseInt(amount);
         realm.write(() => {
           realm.create('Expense', {
@@ -52,7 +59,7 @@ const Payment = ({navigation}) => {
             Title: paymentTitle,
             Image: image,
             Amount: parseInt(amount),
-            Category: listItem,
+            Category: listItem.name,
             DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
             User: currentProfile.id,
           });
@@ -93,7 +100,7 @@ const Payment = ({navigation}) => {
         message: 'Please enter valid amount input in this field.',
       };
     }
-    if (listItem === 'Category') {
+    if (listItem.name === 'Category') {
       error.category = {
         type: 'required',
         message: ' Please select a category from the list.',
@@ -116,8 +123,8 @@ const Payment = ({navigation}) => {
     navigation.goBack();
   };
 
-  const selectCategory = () => {
-    setListItem('General');
+  const selectCategory = (category) => {
+    setListItem(category);
     setExpanded(false);
   };
 
@@ -232,17 +239,17 @@ const Payment = ({navigation}) => {
           </Text>
         </TouchableOpacity>
         <List.Accordion
-          title={listItem}
+          title={listItem.name}
           titleStyle={{fontSize: hp(2), fontWeight: 'bold'}}
           description={
-            listItem === 'Category'
-              ? 'Select Category in which you want add this expense'
+            listItem.name === 'Category'
+              ? 'Select Category in which you want add this expense.'
               : null
           }
           expanded={expanded}
           onPress={() => setExpanded(!expanded)}
           left={(props) =>
-            listItem === 'Category' ? (
+            listItem.name === 'Category' ? (
               <Image
                 style={[
                   inlineStyles.avatar,
@@ -252,23 +259,41 @@ const Payment = ({navigation}) => {
                 source={require('../assets/images/category.png')}
               />
             ) : (
-              <Image
-                style={[inlineStyles.avatar, styles.mhSm]}
-                source={require('../assets/images/general.png')}
-              />
+              <View
+                style={[
+                  inlineStyles.avatar,
+                  styles.mhSm,
+                  {backgroundColor: listItem.avatarColor},
+                ]}>
+                <Text style={{color: 'white'}}>{listItem.name[0]}</Text>
+              </View>
             )
           }>
-          <List.Item
-            title="General"
-            titleStyle={{fontSize: hp(2), fontWeight: 'bold'}}
-            left={(props) => (
-              <Image
-                style={[inlineStyles.avatar, styles.mhSm]}
-                source={require('../assets/images/general.png')}
-              />
-            )}
-            onPress={selectCategory}
-          />
+          {categories.map((item, index) => (
+            <List.Item
+              title={item.name}
+              titleStyle={{fontSize: hp(2), fontWeight: 'bold'}}
+              left={(props) =>
+                item.Image !== 'no image' ? (
+                  <Image
+                    style={[inlineStyles.avatar, styles.mhSm]}
+                    source={{uri: 'file://' + item.Image}}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      inlineStyles.avatar,
+                      styles.mhSm,
+                      {backgroundColor: item.avatarColor},
+                    ]}>
+                    <Text style={{color: 'white'}}>{item.name[0]}</Text>
+                  </View>
+                )
+              }
+              onPress={() => selectCategory(item)}
+              key={index}
+            />
+          ))}
         </List.Accordion>
         {validationError &&
           validationError.category &&
@@ -326,6 +351,8 @@ const inlineStyles = StyleSheet.create({
     width: wp(12),
     height: wp(12),
     backgroundColor: 'tomato',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: wp(12) / 2,
   },
   cancelBtn: {

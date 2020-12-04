@@ -48,6 +48,7 @@ const Category = ({navigation}) => {
           Threshold: parseInt(threshold),
           TotalAmount: 0,
           User: user.id,
+          avatarColor: getRandomColor(),
         });
       });
       navigation.navigate('Dashboard');
@@ -106,6 +107,17 @@ const Category = ({navigation}) => {
   const callback = (res) => {
     setImage(res.path);
     setShowModal(false);
+  };
+
+  const getRandomColor = () => {
+    let letters = '012345'.split('');
+    let color = '#';
+    color += letters[Math.round(Math.random() * 5)];
+    letters = '0123456789ABCDEF'.split('');
+    for (var i = 0; i < 5; i++) {
+      color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
   };
 
   return (

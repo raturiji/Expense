@@ -25,7 +25,13 @@ const AuthStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AppScreen = ({navigation}) => {
+const AppScreen = ({navigation, route}) => {
+  if (route && route.state && route.state.index === 0) {
+    navigation.setOptions({tabBarVisible: true});
+  } else if (route.state && route.state.index !== 0) {
+    navigation.setOptions({tabBarVisible: false});
+  }
+
   return (
     <AppStack.Navigator
       screenOptions={{

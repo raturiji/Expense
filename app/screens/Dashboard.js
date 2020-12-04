@@ -30,6 +30,8 @@ const Dashboard = ({navigation}) => {
   const [saving, setSaving] = useState(null);
   const [categories, setCategories] = useState([]);
   const [details, setDetails] = useState(false);
+  const [categoryTotalPrice, setCategoryTotalPrice] = useState([]);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       user &&
@@ -42,6 +44,7 @@ const Dashboard = ({navigation}) => {
       });
       PresentSaving();
       fetchCategories();
+      // totalPriceCheck();
     });
     return unsubscribe;
   }, [navigation]);
@@ -54,9 +57,10 @@ const Dashboard = ({navigation}) => {
       const thisMonthExpense = realm
         .objects('Expense')
         .filtered(`DateOfCreation LIKE '${moment().format('YYYY-MM')}*' `);
-      let thisMonthSaving =
-        user.Income -
-        thisMonthExpense.map((item) => item.Amount).reduce((a, b) => a + b);
+      let thisMonthSaving = thisMonthExpense.length
+        ? user.Income -
+          thisMonthExpense.map((item) => item.Amount).reduce((a, b) => a + b)
+        : user.Income;
       setSaving(thisMonthSaving);
     });
   };
@@ -67,34 +71,30 @@ const Dashboard = ({navigation}) => {
         .objects('Category')
         .filtered(`User = ${userData.id}`);
       setCategories(category);
+      totalPriceCheck(category);
     });
   };
 
-  // const totalAmount = async (category) => {
-  //   const amount = await Realm.open({schema: [Schema.Expense]}).then(
-  //     (realm) => {
-  //       const categoryData = realm
-  //         .objects('Expense')
-  //         .filtered(
-  //           `Category == '${category}' AND DateOfCreation LIKE '${moment().format(
-  //             'YYYY-MM',
-  //           )}*'`,
-  //         );
-  //       const categoryAmount =
-  //         categoryData.length === 1
-  //           ? categoryData[0].Amount
-  //           : categoryData.map((item) => item.Amount).reduce((a, b) => a + b);
-  //       console.log(categoryAmount, 'retest');
-  //       return categoryAmount;
-  //     },
-  //   );
-  //   console.log(amount, 'testing');
-  //   return amount;
-  // };
-  // console.log(totalAmount(), 'checking');
+  const totalPriceCheck = (categories) => {
+    Realm.open({schema: [Schema.Expense]}).then((realm) => {
+      const thisMonthExpense = realm
+        .objects('Expense')
+        .filtered(`DateOfCreation LIKE '${moment().format('YYYY-MM')}*' `);
+      const totalPrice = categories.map((category) => {
+        const categoryData = thisMonthExpense.length
+          ? thisMonthExpense.filter((item) => item.Category === category.name)
+          : [];
+        const categoryTotalPrice = categoryData.length
+          ? categoryData.map((item) => item.Amount).reduce((a, b) => a + b)
+          : 0;
+        return categoryTotalPrice;
+      });
+      setCategoryTotalPrice(totalPrice);
+    });
+  };
+
   const ExpensePercentage = ((user.Income - saving) / user.Income) * 100;
   const SavingPercentage = (saving / user.Income) * 100;
-
   return (
     <ImageBackground
       source={require('../assets/images/background2.jpg')}
@@ -187,21 +187,45 @@ const Dashboard = ({navigation}) => {
               <Pie
                 radius={50}
                 innerRadius={20}
-                sections={[
-                  {
-                    percentage: 100,
-                    color: '#39B7CD',
-                  },
-                  {
-                    percentage: parseInt(ExpensePercentage),
-                    color: 'red',
-                  },
-                  {
-                    percentage: parseInt(SavingPercentage),
-                    color: 'green',
-                  },
-                ]}
-                strokeCap={'butt'}
+                // sections={[
+                //   {
+                //     percentage: 100,
+                //     color: '#39B7CD',
+                //   },
+                //   {
+                //     percentage: parseInt(ExpensePercentage),
+                //     color: 'red',
+                //   },
+                //   {
+                //     percentage: parseInt(SavingPercentage),
+                //     color: 'green',
+                //   },
+                // ]}
+                sections={
+                  categoryTotalPrice.length && categories.length
+                    ? [
+                        {
+                          percentage: 100,
+                          color: '#e3e3e3',
+                        },
+                        ...categories.map((item, index) => {
+                          return {
+                            percentage: isNaN(
+                              (categoryTotalPrice[index] / user.Income) * 100,
+                            )
+                              ? 0
+                              :  (categoryTotalPrice[index] / user.Income) * 100,
+                            color: item.avatarColor,
+                          };
+                        }),
+                      ]
+                    : [
+                        {
+                          percentage: 0,
+                          color: 'red',
+                        },
+                      ]
+                }
               />
             )}
             <View style={[styles.mhSm]}>
@@ -240,6 +264,44 @@ const Dashboard = ({navigation}) => {
           </View>
           {details ? (
             <View style={[styles.mvSm]}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: wp(4),
+                  marginVertical: wp(2),
+                }}>
+                <View style={{flexDirection: 'row'}}>
+                  <View
+                    style={[
+                      inlineStyles.profileAvatar,
+                      {backgroundColor: '#e3e3e3'},
+                    ]}>
+                    <Text style={{color: colorCode.dark}}>S</Text>
+                  </View>
+                  <View style={{justifyContent: 'center'}}>
+                    <Text
+                      style={[
+                        {
+                          fontSize: 18,
+                          fontWeight: 'bold',
+                          textTransform: 'uppercase',
+                        },
+                      ]}>
+                      Savings
+                    </Text>
+                    <Text style={{fontWeight: 'bold', color: 'grey'}}>
+                      {((saving / user.Income) * 100).toFixed(1)}%
+                    </Text>
+                  </View>
+                </View>
+                <View style={{justifyContent: 'center'}}>
+                  <Text
+                    style={{fontWeight: 'bold', fontSize: 18, color: 'gray'}}>
+                    &#8377; {saving}
+                  </Text>
+                </View>
+              </View>
               {categories.map((category, index) => (
                 <View
                   style={{
@@ -250,7 +312,11 @@ const Dashboard = ({navigation}) => {
                   }}
                   key={index}>
                   <View style={{flexDirection: 'row'}}>
-                    <View style={[inlineStyles.profileAvatar]}>
+                    <View
+                      style={[
+                        inlineStyles.profileAvatar,
+                        {backgroundColor: category.avatarColor},
+                      ]}>
                       <Text style={{color: colorCode.light}}>
                         {category.name[0]}
                       </Text>
@@ -267,14 +333,14 @@ const Dashboard = ({navigation}) => {
                         {category.name}
                       </Text>
                       <Text style={{fontWeight: 'bold', color: 'grey'}}>
-                        {(category.TotalAmount / user.Income) * 100}%
+                        {(categoryTotalPrice[index] / user.Income) * 100}%
                       </Text>
                     </View>
                   </View>
                   <View style={{justifyContent: 'center'}}>
                     <Text
                       style={{fontWeight: 'bold', fontSize: 18, color: 'gray'}}>
-                      &#8377;{category.TotalAmount}
+                      &#8377; {categoryTotalPrice[index]}
                     </Text>
                   </View>
                 </View>

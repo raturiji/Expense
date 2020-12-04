@@ -74,6 +74,7 @@ const Profile = ({navigation}) => {
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
           Threshold: 0,
           User: id,
+          avatarColor: getRandomColor(),
         });
       });
 
@@ -151,6 +152,17 @@ const Profile = ({navigation}) => {
   const callback = (res) => {
     setImage(res.path);
     setShowModal(false);
+  };
+
+  const getRandomColor = () => {
+    let letters = '012345'.split('');
+    let color = '#';
+    color += letters[Math.round(Math.random() * 5)];
+    letters = '0123456789ABCDEF'.split('');
+    for (var i = 0; i < 5; i++) {
+      color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, ScrollView} from 'react-native';
+import {View, Text, ScrollView, Image} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -27,7 +27,7 @@ const CategoryDetails = ({route, navigation}) => {
       setCategoryExpenseData(data);
       setCategory(categories[0]);
     });
-  }, []);
+  }, [route.params.name]);
 
   let sampleData = categoryExpenseData.map((item) => {
     return {x: item.DateOfCreation.split(' ')[0], y: item.Amount};
@@ -35,13 +35,20 @@ const CategoryDetails = ({route, navigation}) => {
 
   const actionSheetRef = useRef();
 
-  const ExpensePercentage =
-    category && (category.TotalAmount / category.Threshold) * 100;
+  const totalAmount = categoryExpenseData.length
+    ? categoryExpenseData.map((item) => item.Amount).reduce((a, b) => a + b)
+    : 0;
+
+  const ExpensePercentage = sampleData.length
+    ? category && ((totalAmount / category.Threshold) * 100).toFixed(1)
+    : 0;
+
+  console.log(category, 'checkked');
 
   return (
     <ScrollView>
       <View style={{marginTop: wp(4)}}>
-        {category && category.TotalAmount ? (
+        {totalAmount > 0 ? (
           <PureChart
             data={[{x: 2020 - 11 - 23, y: 0}, ...sampleData]}
             type="line"
@@ -50,7 +57,7 @@ const CategoryDetails = ({route, navigation}) => {
           />
         ) : null}
       </View>
-      <View style={{height: hp(50)}}>
+      <ScrollView style={{height: hp(50)}}>
         <View style={[styles.row]}>
           <Text
             style={{
@@ -74,7 +81,12 @@ const CategoryDetails = ({route, navigation}) => {
             style={{
               backgroundColor: '#89CFF0',
               height: hp(5),
-              width: ExpensePercentage,
+              width:
+                ExpensePercentage > 100
+                  ? '100%'
+                  : ExpensePercentage
+                  ? `${ExpensePercentage}%`
+                  : null,
               justifyContent: 'center',
               borderRadius: 5,
               paddingLeft: wp(2),
@@ -114,7 +126,8 @@ const CategoryDetails = ({route, navigation}) => {
               }}
             />
             <Text style={{color: 'black', fontWeight: '600', fontSize: wp(4)}}>
-              Threshold({100 - ExpensePercentage}%)
+              Threshold(
+              {100 - ExpensePercentage}%)
             </Text>
           </View>
         </View>
@@ -129,31 +142,71 @@ const CategoryDetails = ({route, navigation}) => {
               borderColor: '#e3e3e3',
             },
           ]}>
-          <Text style={{fontSize: hp(3)}}>Total</Text>
+          <Text style={{fontSize: hp(3)}}>Threshold Amount</Text>
           <Text style={{fontSize: hp(2.5)}}>
-            &#8377; {categoryExpenseData.length ? category.TotalAmount : 0}
+            &#8377; {category && category.Threshold}
           </Text>
         </View>
-        <ScrollView>
+        <View
+          style={[
+            styles.row,
+            {
+              justifyContent: 'space-between',
+              paddingVertical: hp(2),
+              marginHorizontal: wp(2),
+              borderBottomWidth: 1,
+              borderColor: '#e3e3e3',
+            },
+          ]}>
+          <Text style={{fontSize: hp(3)}}>Total</Text>
+          <Text style={{fontSize: hp(2.5)}}>&#8377; {totalAmount}</Text>
+        </View>
+        <View>
           {categoryExpenseData.map((item, index) => (
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}
               key={index}>
               <View style={{flexDirection: 'row'}}>
-                <View
-                  style={{
-                    width: wp(10),
-                    height: wp(10),
-                    backgroundColor: 'red',
-                    borderRadius: wp(2),
-                    margin: wp(2),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Text style={{color: 'white', fontSize: wp(6)}}>
-                    {item.Title[0]}
-                  </Text>
-                </View>
+                {item.image === 'no image' ? (
+                  // <View
+                  //   style={{
+                  //     width: wp(10),
+                  //     height: wp(10),
+                  //     backgroundColor: 'red',
+                  //     borderRadius: wp(2),
+                  //     margin: wp(2),
+                  //     justifyContent: 'center',
+                  //     alignItems: 'center',
+                  //   }}>
+                  //   <Text style={{color: 'white', fontSize: wp(6)}}>
+                  //     {item.Title[0]}
+                  //   </Text>
+                  // </View>
+                  // <View
+                  //   style={{
+                  //     width: wp(10),
+                  //     height: wp(10),
+                  //     backgroundColor: 'green',
+                  //     borderRadius: wp(2),
+                  //     margin: wp(2),
+                  //     justifyContent: 'center',
+                  //     alignItems: 'center',
+                  //   }}>
+                  //   <Text style={{color: 'white', fontSize: wp(6)}}>sdssddsds</Text>
+                  // </View>
+                  <Text>dshgdsfdhsggfhjb</Text>
+                ) : (
+                  <Image
+                    style={{
+                      width: wp(10),
+                      height: wp(10),
+                      backgroundColor: 'red',
+                      borderRadius: wp(2),
+                      margin: wp(2),
+                    }}
+                    source={{uri: 'file://' + item.Image}}
+                  />
+                )}
                 <View style={[{justifyContent: 'center'}]}>
                   <Text
                     style={{
@@ -179,8 +232,8 @@ const CategoryDetails = ({route, navigation}) => {
               </Text>
             </View>
           ))}
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
       {/* <ActionSheet ref={actionSheetRef}>
         <ImageBackground
           style={{width: wp(100), height: hp(75)}}

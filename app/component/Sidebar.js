@@ -23,6 +23,7 @@ const Sidebar = ({navigation}) => {
   const userData = useSelector((state) => state.appData.userData);
   const [user, setUser] = useState(userData);
   const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('General');
 
   useEffect(() => {
     Realm.open({schema: [Schema.Category]}).then((realm) => {
@@ -38,8 +39,10 @@ const Sidebar = ({navigation}) => {
   };
 
   const openCategoryDetails = (category) => {
+    setActiveCategory(category);
     navigation.navigate('CategoryDetails', {name: category});
   };
+
   return (
     <View style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
       <SafeAreaView>
@@ -66,6 +69,7 @@ const Sidebar = ({navigation}) => {
             title={item.name}
             key={item.id}
             image={item.Image}
+            color={item.avatarColor}
             onPress={
               item.name === 'General'
                 ? backToDashboard
@@ -86,7 +90,7 @@ const Sidebar = ({navigation}) => {
   );
 };
 
-const ListItem = ({onPress, title, active, image}) => {
+const ListItem = ({onPress, title, active, image, color}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -98,9 +102,12 @@ const ListItem = ({onPress, title, active, image}) => {
       }}
       key={4}>
       {image !== 'no image' ? (
-        <Image style={[inlineStyles.profileAvatar]} source={{uri: image}} />
+        <Image
+          style={[inlineStyles.profileAvatar]}
+          source={{uri: 'file://' + image}}
+        />
       ) : (
-        <View style={[inlineStyles.profileAvatar]}>
+        <View style={[inlineStyles.profileAvatar, {backgroundColor: color}]}>
           <Text style={{color: colorCode.light}}>{title[0]}</Text>
         </View>
       )}

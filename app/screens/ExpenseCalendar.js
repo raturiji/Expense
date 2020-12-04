@@ -7,6 +7,7 @@ import {
   ImageBackground,
   ScrollView,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -18,25 +19,35 @@ import {Calendar} from 'react-native-calendars';
 import {styles} from '../desgin/style';
 import Realm from 'realm';
 import ActionSheet from 'react-native-actions-sheet';
-import {launchCamera} from 'react-native-image-picker';
+import ImageView from 'react-native-image-viewing';
 import Schema from '../Database/Schema';
 import moment from 'moment';
 
 const ExpenseCalendar = ({navigation}) => {
   const [selectedDateExpense, setSelectedDateExpense] = useState([]);
   const [expenseDates, setExpenseDates] = useState(null);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [visible, setIsVisible] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     fetchData();
+    fetchCategories();
   }, []);
 
   const actionSheetRef = useRef();
 
+  const openImageViewer = (item) => {
+    setSelectedExpense(item);
+    setIsVisible(true);
+  };
+
   const expenseListItem = (item, index) => {
     return (
-      <View
+      <TouchableOpacity
         style={{flexDirection: 'row', justifyContent: 'space-between'}}
-        key={index}>
+        key={index}
+        onPress={() => openImageViewer(item)}>
         <View style={{flexDirection: 'row'}}>
           {item.Image !== 'no image' ? (
             <Image
@@ -50,17 +61,33 @@ const ExpenseCalendar = ({navigation}) => {
               source={{uri: 'file://' + item.Image}}
             />
           ) : (
+            // <View
+            //   style={{
+            //     width: wp(10),
+            //     height: wp(10),
+            //     backgroundColor: 'red',
+            //     borderRadius: wp(2),
+            //     margin: wp(2),
+            //     justifyContent: 'center',
+            //     alignItems: 'center',
+            //   }}>
+            //   <Text style={{color: 'white', fontSize: wp(6)}}>G</Text>
+            // </View>
             <View
               style={{
                 width: wp(10),
                 height: wp(10),
-                backgroundColor: 'red',
+                backgroundColor: categories.filter(
+                  (category) => category.name === item.Category,
+                )[0].avatarColor,
                 borderRadius: wp(2),
                 margin: wp(2),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text style={{color: 'white', fontSize: wp(6)}}>G</Text>
+              <Text style={{color: 'white', fontSize: wp(6)}}>
+                {item.Category[0]}
+              </Text>
             </View>
           )}
           <View style={[{justifyContent: 'center'}]}>
@@ -89,7 +116,7 @@ const ExpenseCalendar = ({navigation}) => {
           }}>
           &#8377; {item.Amount}
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -154,8 +181,15 @@ const ExpenseCalendar = ({navigation}) => {
     return count;
   };
 
+  const fetchCategories = () => {
+    Realm.open({schema: [Schema.Category]}).then((realm) => {
+      const category = realm.objects('Category');
+      setCategories(category);
+    });
+  };
+
   return (
-    <View style={{flex: 1}}>
+    <ScrollView style={{flex: 1}}>
       <Calendar
         markingType={'custom'}
         markedDates={{
@@ -250,7 +284,36 @@ const ExpenseCalendar = ({navigation}) => {
         }}
         onPress={() => actionSheetRef.current?.setModalVisible()}
       />
-    </View>
+      <ImageView
+        images={selectedExpense && [{uri: 'file://' + selectedExpense.Image}]}
+        imageIndex={0}
+        visible={visible}
+        onRequestClose={() => setIsVisible(false)}
+        FooterComponent={() => (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginHorizontal: wp(4),
+            }}>
+            <View>
+              <Text style={{color: 'white', fontSize: wp(5)}}>
+                {selectedExpense && selectedExpense.Title}
+              </Text>
+              <Text style={{color: 'white', fontSize: wp(4)}}>
+                {selectedExpense && selectedExpense.DateOfCreation}
+              </Text>
+            </View>
+            <View>
+              <Text style={{color: 'white', fontSize: wp(5)}}>
+                &#8377; {selectedExpense && selectedExpense.Amount}
+              </Text>
+            </View>
+          </View>
+        )}
+      />
+    </ScrollView>
   );
 };
 
