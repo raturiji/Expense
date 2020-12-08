@@ -36,11 +36,15 @@ const Payment = ({navigation}) => {
   const [image, setImage] = useState('no image');
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [expenseData, setExpenseData] = useState([]);
+  const [alert, setAlert] = useState(false);
 
   useEffect(() => {
-    Realm.open({schema: [Schema.Category]}).then((realm) => {
+    Realm.open({schema: [Schema.Category, Schema.Expense]}).then((realm) => {
       const category = realm.objects('Category');
+      const expense = realm.objects('Expense');
       setCategories(category);
+      setExpenseData(expense);
     });
   }, []);
 
@@ -107,7 +111,13 @@ const Payment = ({navigation}) => {
       };
     }
     if (Object.keys(error).length === 0) {
-      makePayment();
+      if (
+        amount > expenseData.map((item) => item.Amount).reduce((a, b) => a + b)
+      ) {
+        setAlert(true);
+      } else {
+        makePayment();
+      }
     } else {
       setValidationError(error);
       showMessage({
@@ -124,7 +134,11 @@ const Payment = ({navigation}) => {
   };
 
   const selectCategory = (category) => {
+    const categoryExpenseData = expenseData.map(
+      (item) => item.Category === category,
+    );
     setListItem(category);
+    setExpenseData(categoryExpenseData);
     setExpanded(false);
   };
 
@@ -238,6 +252,9 @@ const Payment = ({navigation}) => {
             </Text>
           </Text>
         </TouchableOpacity>
+        {showModal ? (
+          <ImageOptionModal fetchImage={fetchImageData} close={setShowModal} />
+        ) : null}
         <List.Accordion
           title={listItem.name}
           titleStyle={{fontSize: hp(2), fontWeight: 'bold'}}
@@ -322,8 +339,52 @@ const Payment = ({navigation}) => {
           <Text style={[inlineStyles.submitText]}>Cancel</Text>
         </TouchableOpacity>
       </ScrollView>
-      {showModal ? (
-        <ImageOptionModal fetchImage={fetchImageData} close={setShowModal} />
+      {alert ? (
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            width: wp(100),
+            height: hp(100),
+            position: 'absolute',
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{backgroundColor: 'white', padding: wp(2), width: wp(80)}}>
+            <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
+              By making this payment you are crosssing your threshold limit of
+              this category. Do you want to continue
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              backgroundColor: 'white',
+              paddingVertical: wp(3),
+              width: wp(80),
+            }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'green',
+                paddingHorizontal: wp(3),
+                paddingVertical: wp(2),
+                borderRadius: wp(1),
+              }}>
+              <Text style={{color: 'white'}}>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'tomato',
+                paddingHorizontal: wp(3),
+                paddingVertical: wp(2),
+                borderRadius: wp(1),
+              }}>
+              <Text style={{color: 'white'}}>No</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       ) : null}
     </ImageBackground>
   );

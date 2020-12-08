@@ -112,12 +112,6 @@ const Dashboard = ({navigation}) => {
           ]}>
           <View style={[styles.row, styles.between, styles.mhSm, styles.mvSm]}>
             <Text style={styles.headerTitle}>Overview - December</Text>
-            <Icon
-              iconType="AntDesign"
-              color="black"
-              size={20}
-              name="caretdown"
-            />
           </View>
           <View
             style={[
@@ -214,7 +208,7 @@ const Dashboard = ({navigation}) => {
                               (categoryTotalPrice[index] / user.Income) * 100,
                             )
                               ? 0
-                              :  (categoryTotalPrice[index] / user.Income) * 100,
+                              : (categoryTotalPrice[index] / user.Income) * 100,
                             color: item.avatarColor,
                           };
                         }),
@@ -251,7 +245,7 @@ const Dashboard = ({navigation}) => {
                     paddingBottom: 10,
                   },
                 ]}>
-                You are few bucks away to reach your goal
+                You are few bucks away to reach your goal.
               </Text>
               <TouchableOpacity
                 style={[inlineStyles.detailsBtn, styles.row, styles.ctr]}
@@ -285,7 +279,6 @@ const Dashboard = ({navigation}) => {
                         {
                           fontSize: 18,
                           fontWeight: 'bold',
-                          textTransform: 'uppercase',
                         },
                       ]}>
                       Savings
@@ -327,7 +320,6 @@ const Dashboard = ({navigation}) => {
                           {
                             fontSize: 18,
                             fontWeight: 'bold',
-                            textTransform: 'uppercase',
                           },
                         ]}>
                         {category.name}

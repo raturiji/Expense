@@ -43,8 +43,6 @@ const CategoryDetails = ({route, navigation}) => {
     ? category && ((totalAmount / category.Threshold) * 100).toFixed(1)
     : 0;
 
-  console.log(category, 'checkked');
-
   return (
     <ScrollView>
       <View style={{marginTop: wp(4)}}>

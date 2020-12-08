@@ -273,7 +273,7 @@ const ExpenseCalendar = ({navigation}) => {
           </ScrollView>
         </ImageBackground>
       </ActionSheet>
-      <FAB
+      {/* <FAB
         icon="plus"
         animated={true}
         style={{
@@ -283,7 +283,7 @@ const ExpenseCalendar = ({navigation}) => {
           bottom: hp(5),
         }}
         onPress={() => actionSheetRef.current?.setModalVisible()}
-      />
+      /> */}
       <ImageView
         images={selectedExpense && [{uri: 'file://' + selectedExpense.Image}]}
         imageIndex={0}

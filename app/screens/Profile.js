@@ -17,6 +17,7 @@ import {TextInput} from 'react-native-paper';
 import Realm from 'realm';
 import {useSelector, useDispatch} from 'react-redux';
 import * as wpActions from '../Store/actions';
+import Icon from '../component/Icon';
 import moment from 'moment';
 import {showMessage} from 'react-native-flash-message';
 import Schema from '../Database/Schema';
@@ -165,6 +166,7 @@ const Profile = ({navigation}) => {
     return color;
   };
 
+  console.log(image, 'testing');
   return (
     <ScrollView>
       <Text style={[inlineStyles.heading]}>Profile Details</Text>
@@ -292,7 +294,7 @@ const Profile = ({navigation}) => {
             {validationError.savings.message}
           </Text>
         )}
-      {image !== 'no image' && (
+      {image !== 'no image' && image !== undefined && (
         <Image
           source={{uri: 'file://' + image}}
           style={{
@@ -304,15 +306,25 @@ const Profile = ({navigation}) => {
         />
       )}
       <TouchableOpacity
-        style={[inlineStyles.captureBtn, styles.pvSm, styles.mvSm]}
-        onPress={() => setShowModal(!showModal)}>
+        style={[inlineStyles.captureBtn, styles.row]}
+        onPress={() => setShowModal(true)}>
+        <Icon iconType="FontAwesome" name="camera" size={40} color="grey" />
         <Text
           style={{
             fontSize: hp(2),
             textAlign: 'center',
-            color: colorCode.light,
+            marginHorizontal: wp(2),
+            color: colorCode.dark,
           }}>
           Capture Image
+          <Text
+            style={{
+              fontSize: hp(1.5),
+              textAlign: 'center',
+              color: colorCode.DarkGray,
+            }}>
+            (Optional)
+          </Text>
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -338,9 +350,9 @@ const inlineStyles = StyleSheet.create({
     marginVertical: hp(4),
   },
   captureBtn: {
-    backgroundColor: colorCode.danger,
     borderRadius: 25,
-    marginHorizontal: wp(32),
+    alignSelf: 'center',
+    marginVertical: hp(5),
   },
   submitText: {
     fontSize: hp(2),

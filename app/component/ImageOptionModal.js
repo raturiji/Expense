@@ -19,13 +19,13 @@ const ImageOptionModal = (props) => {
   return (
     <View
       style={{
-        backgroundColor: 'transparent',
         width: wp(100),
         height: hp(100),
         position: 'absolute',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        zIndex: 1000,
       }}>
       <View
         style={{
