@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -23,7 +24,7 @@ const Drawer = createDrawerNavigator();
 const AppStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 const AppScreen = ({navigation, route}) => {
   if (route && route.state && route.state.index === 0) {
@@ -52,6 +53,7 @@ const AppScreen = ({navigation, route}) => {
         ),
         gestureEnabled: false,
       }}>
+      <AppStack.Screen name="Tabs" component={Tabs} options={dashboardHeader} />
       <AppStack.Screen
         name="Dashboard"
         component={Dashboard}
@@ -109,18 +111,20 @@ const Tabs = () => {
   return (
     <Tab.Navigator
       tabBarOptions={{
-        activeTintColor: 'red',
+        activeTintColor: 'white',
+        tabStyle: {backgroundColor: '#00538C', flexDirection: 'row'},
+        showIcon: true,
       }}>
       <Tab.Screen
         name="Status"
-        component={AppScreen}
+        component={Dashboard}
         options={{
           tabBarIcon: ({focused}) => {
             return (
               <Icon
                 name="account-balance"
                 iconType="MaterialIcons"
-                color={focused ? 'red' : 'gray'}
+                color={focused ? 'white' : 'gray'}
                 size={20}
               />
             );
@@ -136,7 +140,7 @@ const Tabs = () => {
               <Icon
                 name="calendar-blank-multiple"
                 iconType="MaterialCommunityIcons"
-                color={focused ? 'red' : 'gray'}
+                color={focused ? 'white' : 'gray'}
                 size={20}
               />
             );
@@ -151,7 +155,11 @@ const Routes = ({navigation}) => {
   const userData = useSelector((state) => state.appData.userData);
   return userData && userData.id ? (
     <Drawer.Navigator drawerContent={(props) => <Sidebar {...props} />}>
-      <Drawer.Screen name="Tabs" component={Tabs} options={headerOptions} />
+      <Drawer.Screen
+        name="Tabs"
+        component={AppScreen}
+        options={headerOptions}
+      />
     </Drawer.Navigator>
   ) : (
     <AuthScreen />
@@ -165,4 +173,14 @@ const headerOptions = {
     backgroundColor: '#2e5090',
   },
   headerTintColor: colorCode.light,
+};
+
+const dashboardHeader = {
+  headerStyle: {
+    backgroundColor: '#2e5090',
+    borderBottomWidth: 0,
+    shadowOffset: {height: 0, width: 0},
+  },
+  headerTintColor: colorCode.light,
+  title: 'Dashboard',
 };
