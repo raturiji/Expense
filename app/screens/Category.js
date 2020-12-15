@@ -43,7 +43,7 @@ const Category = ({navigation}) => {
         realm.create('Category', {
           id,
           name: title,
-          Image: image,
+          Image: image === undefined ? 'no image' : image,
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
           Threshold: parseInt(threshold),
           TotalAmount: 0,
@@ -197,7 +197,7 @@ const Category = ({navigation}) => {
             {validationError.threshold.message}
           </Text>
         )}
-      {image !== 'no image' && (
+      {image !== 'no image' && image !== undefined && (
         <Image
           source={{uri: 'file://' + image}}
           style={{

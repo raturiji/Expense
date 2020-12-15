@@ -61,7 +61,7 @@ const Payment = ({navigation}) => {
               realm.objects('Expense')[realm.objects('Expense').length - 1].id +
               1,
             Title: paymentTitle,
-            Image: image,
+            Image: image === undefined ? 'no image' : image,
             Amount: parseInt(amount),
             Category: listItem.name,
             DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -219,7 +219,7 @@ const Payment = ({navigation}) => {
               {validationError.amount.message}
             </Text>
           )}
-        {image !== 'no image' && (
+        {image !== 'no image' && image !== undefined && (
           <Image
             source={{uri: 'file://' + image}}
             style={{

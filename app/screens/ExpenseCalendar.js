@@ -284,35 +284,59 @@ const ExpenseCalendar = ({navigation}) => {
         }}
         onPress={() => actionSheetRef.current?.setModalVisible()}
       /> */}
-      <ImageView
-        images={selectedExpense && [{uri: 'file://' + selectedExpense.Image}]}
-        imageIndex={0}
-        visible={visible}
-        onRequestClose={() => setIsVisible(false)}
-        FooterComponent={() => (
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginHorizontal: wp(4),
-            }}>
-            <View>
-              <Text style={{color: 'white', fontSize: wp(5)}}>
-                {selectedExpense && selectedExpense.Title}
-              </Text>
-              <Text style={{color: 'white', fontSize: wp(4)}}>
-                {selectedExpense && selectedExpense.DateOfCreation}
-              </Text>
+      {selectedExpense && selectedExpense.Image && (
+        <ImageView
+          images={
+            selectedExpense && selectedExpense.Image === 'no image'
+              ? [require('../assets/images/noImage.jpg')]
+              : [{uri: 'file://' + selectedExpense.Image}]
+          }
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+          FooterComponent={() => (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginHorizontal: wp(4),
+              }}>
+              <View>
+                <Text style={{color: 'white', fontSize: wp(5)}}>
+                  {selectedExpense && selectedExpense.Title}
+                </Text>
+                <Text style={{color: 'white', fontSize: wp(4)}}>
+                  {selectedExpense && selectedExpense.Category}
+                </Text>
+                <Text style={{color: 'white', fontSize: wp(4)}}>
+                  {selectedExpense && selectedExpense.DateOfCreation}
+                </Text>
+              </View>
+              <View>
+                <Text style={{color: 'white', fontSize: wp(5)}}>
+                  &#8377; {selectedExpense && selectedExpense.Amount}
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={{color: 'white', fontSize: wp(5)}}>
-                &#8377; {selectedExpense && selectedExpense.Amount}
-              </Text>
-            </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
+      {/* {selectedExpense && selectedExpense.Image === 'no image' && visible && (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            zIndex: 200000,
+            backgroundColor: 'red',
+            position: 'absolute',
+          }}>
+          <Text>G</Text>
+        </View>
+      )} */}
     </ScrollView>
   );
 };

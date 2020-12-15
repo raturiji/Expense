@@ -35,7 +35,7 @@ const Sidebar = ({navigation}) => {
   }, []);
 
   const backToDashboard = () => {
-    navigation.navigate('Dashboard');
+    navigation.navigate('Status');
   };
 
   const openCategoryDetails = (category) => {
@@ -101,7 +101,7 @@ const ListItem = ({onPress, title, active, image, color}) => {
         flexDirection: 'row',
       }}
       key={4}>
-      {image !== 'no image' ? (
+      {image !== 'no image' && image !== undefined ? (
         <Image
           style={[inlineStyles.profileAvatar]}
           source={{uri: 'file://' + image}}

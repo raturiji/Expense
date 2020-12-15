@@ -45,7 +45,7 @@ const Profile = ({navigation}) => {
           id,
           FirstName: firstName,
           LastName: lastName,
-          Image: image,
+          Image: image === undefined ? 'no image' : image,
           DateOfCreation: moment().format('YYYY-MM-DD HH:mm:ss'),
           Income: parseInt(income),
           Savings: parseInt(savings),

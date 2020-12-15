@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Image,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -305,15 +306,22 @@ const Dashboard = ({navigation}) => {
                   }}
                   key={index}>
                   <View style={{flexDirection: 'row'}}>
-                    <View
-                      style={[
-                        inlineStyles.profileAvatar,
-                        {backgroundColor: category.avatarColor},
-                      ]}>
-                      <Text style={{color: colorCode.light}}>
-                        {category.name[0]}
-                      </Text>
-                    </View>
+                    {category.Image === 'no image' ? (
+                      <View
+                        style={[
+                          inlineStyles.profileAvatar,
+                          {backgroundColor: category.avatarColor},
+                        ]}>
+                        <Text style={{color: colorCode.light}}>
+                          {category.name[0]}
+                        </Text>
+                      </View>
+                    ) : (
+                      <Image
+                        source={{uri: 'file://' + category.Image}}
+                        style={[inlineStyles.profileAvatar]}
+                      />
+                    )}
                     <View style={{justifyContent: 'center'}}>
                       <Text
                         style={[
