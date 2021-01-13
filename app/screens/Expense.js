@@ -26,8 +26,8 @@ import {ImagePicker, openGallery} from '../component/ImagePicker';
 import ImageOptionModal from '../component/ImageOptionModal';
 import {styles} from '../desgin/style';
 
-const Payment = ({navigation}) => {
-  const [paymentTitle, setPaymentTitle] = useState('');
+const Expense = ({navigation}) => {
+  const [expenseTitle, setExpenseTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [validationError, setValidationError] = useState(null);
   const currentProfile = useSelector((state) => state.appData.userData);
@@ -48,7 +48,7 @@ const Payment = ({navigation}) => {
     });
   }, []);
 
-  const makePayment = () => {
+  const makeExpense = () => {
     Realm.open({schema: [Schema.User, Schema.Expense, Schema.Category]}).then(
       (realm) => {
         const category = realm
@@ -60,7 +60,7 @@ const Payment = ({navigation}) => {
             id:
               realm.objects('Expense')[realm.objects('Expense').length - 1].id +
               1,
-            Title: paymentTitle,
+            Title: expenseTitle,
             Image: image === undefined ? 'no image' : image,
             Amount: parseInt(amount),
             Category: listItem.name,
@@ -80,16 +80,24 @@ const Payment = ({navigation}) => {
 
   const validationData = () => {
     const error = {};
-    if (paymentTitle === '') {
+    if (expenseTitle === '') {
       error.title = {
         type: 'required',
-        message: 'Please enter Payment Title input. It is a required field.',
+        message: 'Please enter expense Title input. It is a required field.',
       };
     }
-    if (paymentTitle.length >= 60) {
+    if (expenseTitle.length >= 60) {
       error.title = {
         type: 'strength',
-        message: 'Please enter Payment Title in between 1 - 60.',
+        message: 'Please enter expense Title in between 1 - 60.',
+      };
+    }
+
+    if (expenseData.some((item) => item.Title === expenseTitle)) {
+      error.title = {
+        type: 'duplicate',
+        message:
+          'The expense title is already exist in the database. Please enter a different expense tile.',
       };
     }
     if (amount === '') {
@@ -116,7 +124,7 @@ const Payment = ({navigation}) => {
       ) {
         setAlert(true);
       } else {
-        makePayment();
+        makeExpense();
       }
     } else {
       setValidationError(error);
@@ -156,13 +164,13 @@ const Payment = ({navigation}) => {
       source={require('../assets/images/background2.jpg')}
       style={{flex: 1}}>
       <ScrollView>
-        <Text style={[inlineStyles.heading]}>Payment Details</Text>
+        <Text style={[inlineStyles.heading]}>Expense Details</Text>
         <TextInput
-          label="Payment Title"
+          label="Expense Title"
           mode="outlined"
-          placeholder="Enter the payment title"
+          placeholder="Enter the expense title"
           style={{marginHorizontal: wp(4)}}
-          onChangeText={(text) => setPaymentTitle(text)}
+          onChangeText={(text) => setExpenseTitle(text)}
         />
         {validationError &&
           validationError.title &&
@@ -179,6 +187,18 @@ const Payment = ({navigation}) => {
         {validationError &&
           validationError.title &&
           validationError.title.type === 'strength' && (
+            <Text
+              style={{
+                marginHorizontal: wp(5),
+                color: colorCode.danger,
+                marginVertical: hp(1),
+              }}>
+              {validationError.title.message}
+            </Text>
+          )}
+        {validationError &&
+          validationError.title &&
+          validationError.title.type === 'duplicate' && (
             <Text
               style={{
                 marginHorizontal: wp(5),
@@ -390,7 +410,7 @@ const Payment = ({navigation}) => {
   );
 };
 
-export default Payment;
+export default Expense;
 
 const inlineStyles = StyleSheet.create({
   heading: {

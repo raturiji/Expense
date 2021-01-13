@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,6 +16,7 @@ import {
 } from 'react-native-responsive-screen';
 import {FAB} from 'react-native-paper';
 import {colorCode} from '../desgin/colorCode';
+import Icon from '../component/Icon';
 import {Calendar} from 'react-native-calendars';
 import {styles} from '../desgin/style';
 import Realm from 'realm';
@@ -29,11 +31,13 @@ const ExpenseCalendar = ({navigation}) => {
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [visible, setIsVisible] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [deleteList, setDeleteList] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
 
   useEffect(() => {
     fetchData();
     fetchCategories();
-  }, []);
+  }, [deleteList]);
 
   const actionSheetRef = useRef();
 
@@ -42,12 +46,40 @@ const ExpenseCalendar = ({navigation}) => {
     setIsVisible(true);
   };
 
+  const selectItem = (item) => {
+    console.log(
+      deleteList.some((expense) => expense.id === item.id),
+      'doublecheck',
+    );
+    if (
+      deleteList.length &&
+      deleteList.some((expense) => expense.id === item.id)
+    ) {
+      let updatedList = deleteList.filter((expense) => expense.id !== item.id);
+      setDeleteList(updatedList);
+    } else {
+      let updatedList = deleteList.concat(item);
+      setDeleteList(updatedList);
+    }
+  };
+
   const expenseListItem = (item, index) => {
     return (
-      <TouchableOpacity
-        style={{flexDirection: 'row', justifyContent: 'space-between'}}
+      <Pressable
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor:
+            deleteList.length &&
+            deleteList.some((expense) => expense.id === item.id)
+              ? 'red'
+              : 'transparent',
+        }}
         key={index}
-        onPress={() => openImageViewer(item)}>
+        onPress={() =>
+          deleteList.length ? selectItem(item) : openImageViewer(item)
+        }
+        onLongPress={() => selectItem(item)}>
         <View style={{flexDirection: 'row'}}>
           {item.Image !== 'no image' ? (
             <Image
@@ -61,18 +93,6 @@ const ExpenseCalendar = ({navigation}) => {
               source={{uri: 'file://' + item.Image}}
             />
           ) : (
-            // <View
-            //   style={{
-            //     width: wp(10),
-            //     height: wp(10),
-            //     backgroundColor: 'red',
-            //     borderRadius: wp(2),
-            //     margin: wp(2),
-            //     justifyContent: 'center',
-            //     alignItems: 'center',
-            //   }}>
-            //   <Text style={{color: 'white', fontSize: wp(6)}}>G</Text>
-            // </View>
             <View
               style={{
                 width: wp(10),
@@ -116,7 +136,7 @@ const ExpenseCalendar = ({navigation}) => {
           }}>
           &#8377; {item.Amount}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -188,6 +208,22 @@ const ExpenseCalendar = ({navigation}) => {
     });
   };
 
+  const deleteItems = () => {
+    // deleteList.forEach((item) => {
+    //   Realm.open({schema: [Schema.Expense]}).then((realm) => {
+    //     realm.delete(item);
+    //   });
+    // });
+
+    Realm.open({schema: [Schema.Expense]}).then((realm) => {
+      realm.write(() => {
+        realm.delete(deleteList);
+        setDeleteList([]);
+      });
+    });
+    actionSheetRef.current?.setModalVisible(false);
+  };
+  console.log(deleteList, 'test');
   return (
     <ScrollView style={{flex: 1}}>
       <Calendar
@@ -271,6 +307,28 @@ const ExpenseCalendar = ({navigation}) => {
               expenseListItem(item, index),
             )}
           </ScrollView>
+          {deleteList.length ? (
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'orange',
+                position: 'absolute',
+                bottom: wp(8),
+                right: wp(8),
+                width: wp(15),
+                height: wp(15),
+                borderRadius: wp(15) / 2,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={deleteItems}>
+              <Icon
+                name="delete"
+                iconType="MaterialIcons"
+                color="white"
+                size={35}
+              />
+            </TouchableOpacity>
+          ) : null}
         </ImageBackground>
       </ActionSheet>
       {/* <FAB
@@ -284,44 +342,7 @@ const ExpenseCalendar = ({navigation}) => {
         }}
         onPress={() => actionSheetRef.current?.setModalVisible()}
       /> */}
-      {selectedExpense && selectedExpense.Image && (
-        <ImageView
-          images={
-            selectedExpense && selectedExpense.Image === 'no image'
-              ? [require('../assets/images/noImage.jpg')]
-              : [{uri: 'file://' + selectedExpense.Image}]
-          }
-          imageIndex={0}
-          visible={visible}
-          onRequestClose={() => setIsVisible(false)}
-          FooterComponent={() => (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginHorizontal: wp(4),
-              }}>
-              <View>
-                <Text style={{color: 'white', fontSize: wp(5)}}>
-                  {selectedExpense && selectedExpense.Title}
-                </Text>
-                <Text style={{color: 'white', fontSize: wp(4)}}>
-                  {selectedExpense && selectedExpense.Category}
-                </Text>
-                <Text style={{color: 'white', fontSize: wp(4)}}>
-                  {selectedExpense && selectedExpense.DateOfCreation}
-                </Text>
-              </View>
-              <View>
-                <Text style={{color: 'white', fontSize: wp(5)}}>
-                  &#8377; {selectedExpense && selectedExpense.Amount}
-                </Text>
-              </View>
-            </View>
-          )}
-        />
-      )}
+      {}
       {/* {selectedExpense && selectedExpense.Image === 'no image' && visible && (
         <View
           style={{

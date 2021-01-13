@@ -12,7 +12,7 @@ import Dashboard from '../screens/Dashboard';
 import Sidebar from '../component/Sidebar';
 import {colorCode} from '../desgin/colorCode';
 import ExpenseCalendar from '../screens/ExpenseCalendar';
-import Payment from '../screens/Payment';
+import Expense from '../screens/Expense';
 import Settings from '../screens/Settings';
 import Profile from '../screens/Profile';
 import Category from '../screens/Category';
@@ -60,8 +60,8 @@ const AppScreen = ({navigation, route}) => {
         options={headerOptions}
       />
       <AppStack.Screen
-        name="Payment"
-        component={Payment}
+        name="Expense"
+        component={Expense}
         options={headerOptions}
       />
       <AppStack.Screen

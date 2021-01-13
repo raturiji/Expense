@@ -7,6 +7,12 @@ import {Store, persistor} from './app/Store';
 import {Provider as StoreProvider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import FlashMessage from 'react-native-flash-message';
+import {
+  TourGuideProvider, // Main provider
+  TourGuideZone, // Main wrapper of highlight component
+  TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
+  useTourGuideController, // hook to start, etc.
+} from 'rn-tourguide';
 
 const theme = {
   ...DefaultTheme,
@@ -22,14 +28,16 @@ const theme = {
 const App = () => {
   return (
     <StoreProvider store={Store}>
-      <PaperProvider theme={theme}>
-        <PersistGate persistor={persistor}>
-          <NavigationContainer>
-            <Routes />
-          </NavigationContainer>
-          <FlashMessage position="top" />
-        </PersistGate>
-      </PaperProvider>
+      <TourGuideProvider {...{borderRadius: 16}}>
+        <PaperProvider theme={theme}>
+          <PersistGate persistor={persistor}>
+            <NavigationContainer>
+              <Routes />
+            </NavigationContainer>
+            <FlashMessage position="top" />
+          </PersistGate>
+        </PaperProvider>
+      </TourGuideProvider>
     </StoreProvider>
   );
 };

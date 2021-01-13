@@ -31,8 +31,18 @@ const Category = ({navigation}) => {
   const [threshold, setThreshold] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [validationError, setValidationError] = useState({});
+  const [categoryData, setCategoryData] = useState([]);
   const user = useSelector((state) => state.appData.userData);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    Realm.open({
+      schema: [Schema.User, Schema.Expense, Schema.Income, Schema.Category],
+    }).then((realm) => {
+      const category = realm.objects('Category');
+      setCategoryData(category);
+    });
+  }, []);
 
   const createCategory = () => {
     Realm.open({
@@ -67,6 +77,14 @@ const Category = ({navigation}) => {
       error.title = {
         type: 'strength',
         message: 'Please enter category title in between 1 - 60',
+      };
+    }
+    
+    if (categoryData.some((item) => item.name === title)) {
+      console.log('reach');
+      error.title = {
+        type: 'duplicate',
+        message: 'This title is already taken. Please enter a different title',
       };
     }
     if (threshold === '') {
@@ -145,6 +163,18 @@ const Category = ({navigation}) => {
       {validationError &&
         validationError.title &&
         validationError.title.type === 'strength' && (
+          <Text
+            style={{
+              marginHorizontal: wp(5),
+              color: colorCode.danger,
+              marginVertical: hp(1),
+            }}>
+            {validationError.title.message}
+          </Text>
+        )}
+      {validationError &&
+        validationError.title &&
+        validationError.title.type === 'duplicate' && (
           <Text
             style={{
               marginHorizontal: wp(5),

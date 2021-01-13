@@ -78,7 +78,6 @@ const Profile = ({navigation}) => {
           avatarColor: getRandomColor(),
         });
       });
-
       dispatch(wpActions.saveUser(realm.objects('User')[0]));
     });
   };
@@ -165,8 +164,6 @@ const Profile = ({navigation}) => {
     }
     return color;
   };
-
-  console.log(image, 'testing');
   return (
     <ScrollView>
       <Text style={[inlineStyles.heading]}>Profile Details</Text>
