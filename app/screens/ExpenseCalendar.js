@@ -42,6 +42,7 @@ const ExpenseCalendar = ({navigation}) => {
   const actionSheetRef = useRef();
 
   const openImageViewer = (item) => {
+    console.log('reach');
     setSelectedExpense(item);
     setIsVisible(true);
   };
@@ -342,7 +343,44 @@ const ExpenseCalendar = ({navigation}) => {
         }}
         onPress={() => actionSheetRef.current?.setModalVisible()}
       /> */}
-      {}
+      {selectedExpense && selectedExpense.Image && (
+        <ImageView
+          images={
+            selectedExpense && selectedExpense.Image === 'no image'
+              ? [require('../assets/images/noImage.jpg')]
+              : [{uri: 'file://' + selectedExpense.Image}]
+          }
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+          FooterComponent={() => (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginHorizontal: wp(4),
+              }}>
+              <View>
+                <Text style={{color: 'white', fontSize: wp(5)}}>
+                  {selectedExpense && selectedExpense.Title}
+                </Text>
+                <Text style={{color: 'white', fontSize: wp(4)}}>
+                  {selectedExpense && selectedExpense.Category}
+                </Text>
+                <Text style={{color: 'white', fontSize: wp(4)}}>
+                  {selectedExpense && selectedExpense.DateOfCreation}
+                </Text>
+              </View>
+              <View>
+                <Text style={{color: 'white', fontSize: wp(5)}}>
+                  &#8377; {selectedExpense && selectedExpense.Amount}
+                </Text>
+              </View>
+            </View>
+          )}
+        />
+      )}
       {/* {selectedExpense && selectedExpense.Image === 'no image' && visible && (
         <View
           style={{

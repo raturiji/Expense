@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
   Image,
 } from 'react-native';
 import {
@@ -44,7 +45,7 @@ const Sidebar = ({navigation}) => {
   };
 
   return (
-    <View style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
+    <ScrollView style={[{flex: 1, backgroundColor: '#5a5f63'}]}>
       <SafeAreaView>
         {user && user.Image && user.Image !== 'no image' ? (
           <Image
@@ -86,7 +87,7 @@ const Sidebar = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

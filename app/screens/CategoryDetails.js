@@ -44,7 +44,7 @@ const CategoryDetails = ({route, navigation}) => {
     : 0;
 
   return (
-    <ScrollView>
+    <View>
       <View style={{marginTop: wp(4)}}>
         {totalAmount > 0 ? (
           <PureChart
@@ -125,7 +125,7 @@ const CategoryDetails = ({route, navigation}) => {
             />
             <Text style={{color: 'black', fontWeight: '600', fontSize: wp(4)}}>
               Threshold(
-              {100 - ExpensePercentage}%)
+              {(100 - ExpensePercentage).toFixed(1)}%)
             </Text>
           </View>
         </View>
@@ -165,40 +165,27 @@ const CategoryDetails = ({route, navigation}) => {
               style={{flexDirection: 'row', justifyContent: 'space-between'}}
               key={index}>
               <View style={{flexDirection: 'row'}}>
-                {item.image === 'no image' ? (
-                  // <View
-                  //   style={{
-                  //     width: wp(10),
-                  //     height: wp(10),
-                  //     backgroundColor: 'red',
-                  //     borderRadius: wp(2),
-                  //     margin: wp(2),
-                  //     justifyContent: 'center',
-                  //     alignItems: 'center',
-                  //   }}>
-                  //   <Text style={{color: 'white', fontSize: wp(6)}}>
-                  //     {item.Title[0]}
-                  //   </Text>
-                  // </View>
-                  // <View
-                  //   style={{
-                  //     width: wp(10),
-                  //     height: wp(10),
-                  //     backgroundColor: 'green',
-                  //     borderRadius: wp(2),
-                  //     margin: wp(2),
-                  //     justifyContent: 'center',
-                  //     alignItems: 'center',
-                  //   }}>
-                  //   <Text style={{color: 'white', fontSize: wp(6)}}>sdssddsds</Text>
-                  // </View>
-                  <Text>dshgdsfdhsggfhjb</Text>
+                {console.log(item, 'testttttttt')}
+                {item.Image === 'no image' ? (
+                  <View
+                    style={{
+                      width: wp(10),
+                      height: wp(10),
+                      backgroundColor: 'red',
+                      borderRadius: wp(2),
+                      margin: wp(2),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{color: 'white', fontSize: wp(6)}}>
+                      {item.Title[0]}
+                    </Text>
+                  </View>
                 ) : (
                   <Image
                     style={{
                       width: wp(10),
                       height: wp(10),
-                      backgroundColor: 'red',
                       borderRadius: wp(2),
                       margin: wp(2),
                     }}
@@ -232,56 +219,7 @@ const CategoryDetails = ({route, navigation}) => {
           ))}
         </View>
       </ScrollView>
-      {/* <ActionSheet ref={actionSheetRef}>
-        <ImageBackground
-          style={{width: wp(100), height: hp(75)}}
-          source={require('../assets/images/background3.jpg')}>
-          <View style={[styles.row]}>
-            <Text
-              style={{
-                fontSize: wp(5),
-                paddingHorizontal: 20,
-                marginVertical: 20,
-                color: 'white',
-                width: wp(80),
-              }}>
-              Total days on which you spend money of this category.
-            </Text>
-            <View style={[inlineStyles.avatar]}>
-              <Text style={{fontSize: hp(4), color: 'white'}}>
-                {totalExpenseDays()}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={[
-              styles.row,
-              {
-                justifyContent: 'space-between',
-                paddingVertical: hp(2),
-                marginHorizontal: wp(2),
-                borderBottomWidth: 1,
-                borderColor: '#e3e3e3',
-              },
-            ]}>
-            <Text style={{fontSize: hp(3), color: 'white'}}>Total</Text>
-            <Text style={{fontSize: hp(2.5), color: 'white'}}>
-              &#8377;{' '}
-              {selectedDateExpense.length
-                ? selectedDateExpense
-                    .map((item) => item.Amount)
-                    .reduce((a, b) => a + b)
-                : 0}
-            </Text>
-          </View>
-          <ScrollView>
-            {selectedDateExpense.map((item, index) =>
-              expenseListItem(item, index),
-            )}
-          </ScrollView>
-        </ImageBackground>
-      </ActionSheet> */}
-    </ScrollView>
+    </View>
   );
 };
 

@@ -295,7 +295,7 @@ const Expense = ({navigation}) => {
                 ]}
                 source={require('../assets/images/category.png')}
               />
-            ) : (
+            ) : listItem.Image === 'no image' ? (
               <View
                 style={[
                   inlineStyles.avatar,
@@ -304,6 +304,11 @@ const Expense = ({navigation}) => {
                 ]}>
                 <Text style={{color: 'white'}}>{listItem.name[0]}</Text>
               </View>
+            ) : (
+              <Image
+                style={[inlineStyles.avatar, styles.mhSm]}
+                source={{uri: 'file://' + listItem.Image}}
+              />
             )
           }>
           {categories.map((item, index) => (
